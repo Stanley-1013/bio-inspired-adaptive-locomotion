@@ -271,12 +271,12 @@ s.addNotes(
 // ============================================================ SLIDE 3
 s = pres.addSlide();
 header(s, 3, "Plan: Understand → Reproduce → Analyze");
-caption(s, 1.18, "A feasible 3-phase study, with an optional extension — we interpret SATA, not redesign the RL.");
+caption(s, 1.18, "A feasible 3-phase study, with an optional extension — we study SATA, not redesign the RL.");
 
 const phases = [
   { n: "1", t: "Reproduce", c: TEAL, b: "Set up Isaac Gym on a CUDA server (container / venv) and run the official SATA training.", out: "simulation running", opt: false },
   { n: "2", t: "Ablation", c: TEAL, b: "Disable fatigue · change torque limit · modify growth schedule · vary terrain.", out: "behavioral data", opt: false },
-  { n: "3", t: "Adaptive Interpretation", c: TEAL, b: "Growth ↔ gain scheduling\nFatigue ↔ internal feedback\nTorque limit ↔ progressive constraint modulation\n\n(analogies, not claims)", out: "analysis & discussion", opt: false },
+  { n: "3", t: "Control Perspective", c: TEAL, b: "Questions from adaptive control:\nGrowth ↔ gain scheduling\nFatigue ↔ feedback\nTorque modulation ↔ robustness", out: "comparison & discussion", opt: false },
   { n: "4", t: "Residual Compensation", c: "8E9B98", out: "preliminary observations", opt: true,
     rich: [
       { text: "Preliminary exploration.", options: { breakLine: true } },
@@ -334,7 +334,7 @@ s.addText("We study adaptive behavior — not propose a new RL algorithm.",
 // LEFT — expected outputs
 s.addText("EXPECTED OUTPUTS", { x: 0.55, y: 2.55, w: 5.9, h: 0.4, fontSize: 15, bold: true, color: DARK, fontFace: BODY, charSpacing: 0.5, margin: 0 });
 const outs = ["Simulation reproduction", "Behavior analysis (ablation)",
-              "Adaptive control interpretation", "Literature-grounded discussion"];
+              "Control-perspective comparison", "Literature-grounded discussion"];
 let oy = 3.05;
 for (let i = 0; i < outs.length; i++) {
   chip(s, 0.6, oy, 0.42, i + 1, TEAL, WHITE, 14);
@@ -345,14 +345,14 @@ for (let i = 0; i < outs.length; i++) {
 // RIGHT — research questions (2x2)
 s.addText("RESEARCH QUESTIONS", { x: 6.9, y: 2.55, w: 5.9, h: 0.4, fontSize: 15, bold: true, color: DARK, fontFace: BODY, charSpacing: 0.5, margin: 0 });
 const rqs = [["RQ1", "Why torque control?"], ["RQ2", "What creates adaptation?"],
-             ["RQ3", "How does it relate to adaptive control?"], ["RQ4", "Can lightweight compensation help?"]];
+             ["RQ3", "How does SATA address problems traditionally studied in adaptive control?"], ["RQ4", "Can lightweight compensation help?"]];
 const rqW = 2.86, rqH = 1.3, rqGap = 0.2;
 for (let i = 0; i < 4; i++) {
   const cx = 6.9 + (i % 2) * (rqW + rqGap);
   const cy = 3.1 + Math.floor(i / 2) * (rqH + rqGap);
   card(s, cx, cy, rqW, rqH, i === 3 ? AMBER : TEAL);
   s.addText(rqs[i][0], { x: cx + 0.22, y: cy + 0.15, w: rqW - 0.4, h: 0.35, fontSize: 13, bold: true, color: i === 3 ? AMBERD : TEAL, fontFace: HEAD, margin: 0 });
-  s.addText(rqs[i][1], { x: cx + 0.22, y: cy + 0.5, w: rqW - 0.4, h: rqH - 0.65, fontSize: 13, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  s.addText(rqs[i][1], { x: cx + 0.22, y: cy + 0.46, w: rqW - 0.4, h: rqH - 0.58, fontSize: 12, color: INK, fontFace: BODY, margin: 0, valign: "top" });
 }
 
 // BOTTOM — conclusion

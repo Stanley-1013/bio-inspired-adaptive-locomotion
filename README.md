@@ -18,15 +18,19 @@ This repository is intended for educational and research purposes.
 This project takes SATA as its main subject. We first **reproduce** its
 torque-based locomotion pipeline in simulation, then use **ablation
 experiments** to observe how the biomechanical model, fatigue feedback, and
-growth mechanism shape adaptive behavior. We then **discuss** its relationship
-to traditional control concepts from an *adaptive / robust control*
-perspective. If time allows, we further test a simple **residual compensation**
-term to improve behavior in boundary cases.
+growth mechanism shape adaptive behavior. Finally — and this is the framing that
+matters — we do **not** force SATA into classical control theory. Instead we let
+**adaptive / robust control supply the questions** (how to stay stable under
+unknown dynamics, reject disturbances, generalize) and observe **how SATA
+answers them differently** — with learning and biomechanics rather than analytic
+control laws. If time allows, we further test a simple **residual compensation**
+term in boundary cases.
 
-> Note: SATA is a learning-based policy, not a classical adaptive controller —
-> it has no Lyapunov-based update law or online parameter estimation. The
-> adaptive/robust control concepts below are used as a **language for analysis
-> and comparison**, not as claims of formal equivalence.
+> Framing: the goal is **not** to claim SATA *is* adaptive control. SATA is a
+> learning-based policy with no Lyapunov-based update law or online parameter
+> estimation. We instead **compare two philosophies of handling adaptation** —
+> classical adaptive/robust control vs. learning + bio-inspired mechanisms —
+> using the former's questions as a lens.
 
 ## Repository
 
@@ -54,12 +58,14 @@ fatigue, growth) to achieve safe and adaptive locomotion.
 
 - Reproduce SATA in simulation (Isaac Gym + Unitree Go2).
 - Analyze how the bio-inspired designs produce adaptive behaviors.
-- Discuss and compare SATA using the language of **adaptive / robust control**.
+- Compare how SATA and classical adaptive / robust control address the **same
+  adaptation questions** (unknown dynamics, disturbances, generalization).
 - *(Optional, if time allows)* Explore a lightweight **residual compensation**
   term to handle boundary cases.
 
-**Key contribution:** relate learning-based locomotion to adaptive/robust
-control ideas through understanding and experiments.
+**Key contribution:** **contrast two philosophies of adaptation** —
+learning-based locomotion vs. classical adaptive/robust control — through
+understanding and experiments.
 
 ## 3. System Overview (SATA)
 
@@ -92,10 +98,10 @@ adaptation between the learned policy and the simulated robot.
 2. **Which components?** Which components in SATA contribute to adaptive
    behaviors (muscle activation, fatigue feedback, growth mechanism, torque
    scheduling)?
-3. **Control analogy?** How can these adaptation mechanisms be *discussed and
-   compared* using adaptive/robust control language (gain scheduling, internal
-   feedback, disturbance compensation, constraint adaptation) — and where do
-   the analogies break down?
+3. **Shared problems?** How does SATA address problems *traditionally studied in
+   adaptive control* (stability under unknown dynamics, disturbance rejection,
+   generalization) — and how does its learning-based answer differ from an
+   analytic control law?
 4. **Residual compensation?** Could a simple residual compensation term improve
    performance under extreme conditions *without* modifying the RL policy?
 
@@ -105,27 +111,37 @@ adaptation between the learned policy and the simulated robot.
 |-------|-------|----------------|--------|
 | **1. Reproduction** | Set up the pipeline | Set up server/container; install Isaac Gym + SATA; run `go2_torque` training; verify play in simulation | Working simulation pipeline |
 | **2. Observation & Ablation** | Modify baseline and compare | Toggle fatigue model; change torque limit; modify growth schedule; test different terrains | Behavioral insights & data |
-| **3. Adaptive Control Analysis** | Compare mechanisms with control concepts | See mapping table below | Analysis & discussion |
-| **4. Residual Compensation** *(optional, if time allows)* | Explore a lightweight residual term | `T_final = T_SATA + T_residual` to compensate disturbances (friction, payload, terrain change) | Preliminary robustness test in boundary cases |
+| **3. Control Perspective** | Use adaptive-control questions as a lens; compare answers | See tables below | Comparison & discussion |
+| **4. Residual Compensation** *(optional, if time allows)* | Explore a lightweight residual term | `T_final = T_SATA + T_residual` to compensate disturbances (friction, payload, terrain change) | Preliminary observations in boundary cases |
 
-**Phase 3 mapping — SATA mechanism → adaptive/robust control analogy:**
+**Phase 3 — adaptive control supplies the *questions*; SATA gives a different
+kind of *answer*:**
 
-| SATA mechanism | Adaptive/robust control analogy |
+| Adaptation question | Classical adaptive / robust control | SATA (learning + biomechanics) |
+|---------------------|-------------------------------------|--------------------------------|
+| Unknown dynamics | online parameter estimation | learns a robust policy in sim |
+| Disturbances | explicit compensation term | internal state (fatigue) feedback |
+| Generalization | stability proofs / guarantees | empirical, across terrains |
+| Control output | analytic control law | neural torque policy |
+
+We also note where SATA's mechanisms *rhyme with* adaptive-control vocabulary —
+a lens for discussion, not equivalence:
+
+| SATA mechanism | Adaptive-control idea it echoes |
 |----------------|---------------------------------|
-| Activation | Gain scheduling |
-| Fatigue feedback | Internal feedback |
-| Growth limit | Constraint adaptation |
-| Torque control | Compliance |
+| Growth (torque limit / curriculum) | gain scheduling |
+| Fatigue feedback | internal feedback |
+| Torque modulation | robustness / compliance |
 
-*These are analogies for discussion, not formal equivalences — SATA has no
-Lyapunov-based update law or online parameter estimation.*
+*SATA has no Lyapunov-based update law or online parameter estimation — these
+are framing lenses, not formal equivalences.*
 
 ## 6. Expected Outcomes
 
 - Reproduce and understand the SATA framework in simulation.
 - Explain how bio-inspired mechanisms lead to adaptive locomotion.
-- Relate the learning-based approach to adaptive/robust control ideas, while
-  being clear about where the analogies hold and where they break down.
+- Contrast how SATA and classical adaptive/robust control answer the same
+  adaptation questions, being clear about where the framings align and diverge.
 - Provide a baseline for future work on residual/robust compensation and
   real-world studies.
 
@@ -155,8 +171,9 @@ Lyapunov-based update law or online parameter estimation.*
 
 ---
 
-> **Takeaway:** SATA demonstrates that combining torque control with
-> bio-inspired adaptation enables safe, adaptive, and generalizable locomotion.
-> By analyzing it through an adaptive/robust control lens — and, if time allows,
-> exploring a simple residual compensation — we aim to relate learning-based
-> methods to classical control ideas.
+> **Takeaway:** SATA shows that combining torque control with bio-inspired
+> adaptation yields compliant, generalizable locomotion. Rather than forcing it
+> into classical control theory, we use **adaptive control's questions as a
+> lens** and ask how SATA answers them differently — contrasting two
+> philosophies of adaptation (analytic control vs. learning + biomechanics), and
+> optionally probing a simple residual compensation.
