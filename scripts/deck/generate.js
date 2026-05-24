@@ -362,7 +362,7 @@ for (let i = 0; i < 4; i++) {
 // BOTTOM — conclusion
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 6.15, w: 12.23, h: 1.0, fill: { color: DARK } });
 s.addText("IN ONE LINE", { x: 0.85, y: 6.26, w: 11.6, h: 0.28, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 0.5, margin: 0 });
-s.addText("This project studies how bio-inspired torque control produces adaptive locomotion, and interprets it through adaptive and robust control perspectives.",
+s.addText("This project studies how bio-inspired torque control produces adaptive locomotion, and asks how SATA answers questions traditionally posed by adaptive and robust control.",
   { x: 0.85, y: 6.52, w: 11.6, h: 0.55, fontSize: 14, bold: true, color: WHITE, fontFace: BODY, margin: 0, valign: "top" });
 s.addNotes(
   "[~30 sec]\nTALKING POINTS:\n"
