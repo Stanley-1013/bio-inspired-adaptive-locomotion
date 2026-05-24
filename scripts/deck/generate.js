@@ -112,13 +112,13 @@ s.addText("PROGRESS REPORT   ·   ADAPTIVE CONTROL SYSTEMS",
   { x: 1.5, y: 0.9, w: 9.0, h: 0.45, fontSize: 12.5, bold: true, color: AMBER, fontFace: BODY, charSpacing: 1, valign: "middle", margin: 0 });
 
 s.addText("Bio-inspired Adaptive Locomotion\nvia Torque-based Learning",
-  { x: 0.7, y: 2.45, w: 8.5, h: 1.7, fontSize: 34, bold: true, color: WHITE, fontFace: HEAD, lineSpacingMultiple: 1.05, margin: 0, valign: "top" });
+  { x: 0.7, y: 2.7, w: 8.7, h: 1.4, fontSize: 31, bold: true, color: WHITE, fontFace: HEAD, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
 s.addText("A Case Study of SATA",
-  { x: 0.72, y: 4.35, w: 8.4, h: 0.5, fontSize: 20, italic: true, color: ICE, fontFace: HEAD, margin: 0 });
+  { x: 0.72, y: 4.0, w: 8.4, h: 0.5, fontSize: 20, italic: true, color: ICE, fontFace: HEAD, margin: 0 });
 
-s.addShape(pres.shapes.RECTANGLE, { x: 0.74, y: 5.2, w: 2.0, h: 0.05, fill: { color: AMBER } });
-s.addText("Chuan-Han Li", { x: 0.7, y: 5.45, w: 8, h: 0.45, fontSize: 17, bold: true, color: WHITE, fontFace: BODY, margin: 0 });
-s.addText("2026 / 05 / 25", { x: 0.7, y: 5.92, w: 8, h: 0.4, fontSize: 14, color: MUTE, fontFace: BODY, margin: 0 });
+s.addShape(pres.shapes.RECTANGLE, { x: 0.74, y: 4.85, w: 2.0, h: 0.05, fill: { color: AMBER } });
+s.addText("Chuan-Han Li", { x: 0.7, y: 5.1, w: 8, h: 0.45, fontSize: 17, bold: true, color: WHITE, fontFace: BODY, margin: 0 });
+s.addText("2026 / 05 / 25", { x: 0.7, y: 5.57, w: 8, h: 0.4, fontSize: 14, color: MUTE, fontFace: BODY, margin: 0 });
 s.addNotes(
   "[~10 sec]\n"
   + "Open: title, course, your name — one breath, then move on.\n"
@@ -136,26 +136,23 @@ s.addText("THE PROBLEM", { x: 0.8, y: 1.58, w: 5.0, h: 0.32, fontSize: 13, bold:
   color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
 s.addText("Position-based locomotion is accurate under known conditions but rigid — "
   + "it struggles with compliance, disturbances, unknown terrain, and the sim-to-real gap.",
-  { x: 0.8, y: 1.92, w: 5.0, h: 0.95, fontSize: 14, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  { x: 0.8, y: 1.92, w: 5.0, h: 0.95, fontSize: 14, color: INK, fontFace: BODY, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
 
 // situational scene: rigid control struggles on unknown / soft terrain
 s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.55, y: 3.05, w: 5.45, h: 1.3, fill: { color: "EFEBE3" }, line: { color: LINEC, width: 1 }, rectRadius: 0.06 });
-s.addText("RIGID CONTROL ON UNKNOWN TERRAIN", { x: 0.72, y: 3.1, w: 5.1, h: 0.28, fontSize: 10, bold: true, color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
-// left: firm / known
-s.addShape(pres.shapes.LINE, { x: 0.85, y: 4.02, w: 1.45, h: 0, line: { color: "9A8C7A", width: 3 } });
-img(s, IC.dogTeal, 1.18, 3.42, 0.56, 0.56);
-s.addText("firm · known", { x: 0.75, y: 4.05, w: 1.6, h: 0.26, fontSize: 9.5, color: MUTE, fontFace: BODY, align: "center", margin: 0 });
+s.addText("RIGID CONTROL ON UNKNOWN TERRAIN", { x: 0.72, y: 3.12, w: 5.1, h: 0.26, fontSize: 10, bold: true, color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
+// left: firm / known (solid ground)
+img(s, IC.dogTeal, 1.2, 3.46, 0.56, 0.56);
+s.addShape(pres.shapes.LINE, { x: 0.8, y: 4.05, w: 1.55, h: 0, line: { color: "9A8C7A", width: 3 } });
+s.addText("firm · known", { x: 0.7, y: 4.09, w: 1.75, h: 0.24, fontSize: 10, color: MUTE, fontFace: BODY, align: "center", margin: 0 });
 // arrow
-img(s, IC.arrowR, 2.5, 3.62, 0.5, 0.36);
-// right: soft / unknown (dipped ground), leg sinks, force arrow, ✗
-s.addShape(pres.shapes.LINE, { x: 3.35, y: 4.02, w: 0.85, h: 0, line: { color: CLAY, width: 3 } });
-s.addShape(pres.shapes.LINE, { x: 4.2, y: 4.02, w: 0.32, h: 0.26, line: { color: CLAY, width: 3 } });
-s.addShape(pres.shapes.LINE, { x: 4.52, y: 4.28, w: 0.3, h: -0.26, line: { color: CLAY, width: 3 } });
-s.addShape(pres.shapes.LINE, { x: 4.82, y: 4.02, w: 0.9, h: 0, line: { color: CLAY, width: 3 } });
-img(s, IC.dogClay, 3.95, 3.42, 0.56, 0.56);
-img(s, IC.forceDown, 4.55, 3.34, 0.3, 0.42);
-img(s, IC.no, 5.42, 3.42, 0.26, 0.26);
-s.addText("soft · unknown", { x: 3.35, y: 4.05, w: 2.4, h: 0.26, fontSize: 9.5, color: CLAY, fontFace: BODY, align: "center", margin: 0 });
+img(s, IC.arrowR, 2.62, 3.66, 0.5, 0.34);
+// right: soft / unknown (loose dashed ground) + excessive force
+img(s, IC.dogClay, 3.95, 3.46, 0.56, 0.56);
+img(s, IC.forceDown, 4.64, 3.28, 0.28, 0.4);
+img(s, IC.no, 5.52, 3.48, 0.24, 0.24);
+s.addShape(pres.shapes.LINE, { x: 3.45, y: 4.05, w: 2.25, h: 0, line: { color: CLAY, width: 3, dashType: "dash" } });
+s.addText("soft · unknown", { x: 3.55, y: 4.09, w: 2.05, h: 0.24, fontSize: 10, color: CLAY, fontFace: BODY, align: "center", margin: 0 });
 
 // bridge caption
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 4.52, w: 0.08, h: 0.62, fill: { color: TEAL } });
@@ -224,8 +221,8 @@ for (let i = 0; i < nodes.length; i++) {
   s.addShape(pres.shapes.RECTANGLE, { x: fx, y: ny, w: fw, h: 0.6, fill: { color: fill }, line: { color: hot[i] ? TEAL : LINEC, width: hot[i] ? 1.5 : 1 }, shadow: sh() });
   s.addText(nodes[i], { x: fx, y: ny, w: fw, h: 0.6, align: "center", valign: "middle", fontSize: 14, bold: hot[i], color: INK, fontFace: BODY, margin: 0 });
   centers.push(ny + 0.3);
-  if (i < nodes.length - 1) down(s, fx + fw / 2 - 0.2, ny + 0.61, MUTE);
-  ny += 0.8;
+  if (i < nodes.length - 1) down(s, fx + fw / 2 - 0.2, ny + 0.62, MUTE);
+  ny += 0.92;
 }
 // feedback loop (Robot -> rail -> back into Torque Policy)
 const rail = 2.4;
@@ -252,12 +249,12 @@ for (const [d, lab] of micons) {
 card(s, hx, 3.45, hw, 1.5, AMBER);
 chip(s, hx + 0.28, 3.7, 0.55, "G", AMBER, WHITE, 18);
 s.addText("Growth Mechanism", { x: hx + 1.0, y: 3.67, w: hw - 1.2, h: 0.4, fontSize: 18, bold: true, color: AMBERD, fontFace: HEAD, margin: 0 });
-s.addText("torque limit  ·  training curriculum  ·  control frequency", { x: hx + 1.0, y: 4.12, w: hw - 1.2, h: 0.7, fontSize: 14, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+s.addText("torque limit  ·  training curriculum  ·  control frequency", { x: hx + 1.0, y: 4.12, w: hw - 1.2, h: 0.7, fontSize: 14, color: INK, fontFace: BODY, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
 
 s.addShape(pres.shapes.RECTANGLE, { x: hx, y: 5.15, w: hw, h: 0.95, fill: { color: "ECF1F0" }, line: { color: LINEC, width: 1 } });
 s.addText([{ text: "Goal:  ", options: { bold: true, color: TEAL } },
            { text: "smoother torque generation and improved robustness through bio-inspired adaptation.", options: {} }],
-  { x: hx + 0.18, y: 5.15, w: hw - 0.36, h: 0.95, fontSize: 13, color: INK, fontFace: BODY, margin: 0, valign: "middle" });
+  { x: hx + 0.18, y: 5.15, w: hw - 0.36, h: 0.95, fontSize: 13, color: INK, fontFace: BODY, lineSpacingMultiple: 1.08, margin: 0, valign: "middle" });
 refs(s, "SATA · Hill (muscle dynamics) · Liu et al. (fatigue) · Bellegarda & Ijspeert (CPG-RL)");
 s.addNotes(
   "[~55 sec]\nTALKING POINTS:\n"
@@ -297,7 +294,7 @@ for (let i = 0; i < phases.length; i++) {
   chip(s, px + 0.18, pTop + 0.17, 0.5, p.n, WHITE, p.c, 18);
   s.addText(p.opt ? "PHASE 4 · OPTIONAL" : "PHASE " + p.n, { x: px + 0.8, y: pTop + 0.13, w: pW - 0.9, h: 0.28, fontSize: 9.5, bold: true, color: WHITE, fontFace: BODY, charSpacing: 0.5, margin: 0 });
   s.addText(p.t, { x: px + 0.8, y: pTop + 0.4, w: pW - 0.9, h: 0.4, fontSize: 14, bold: true, color: WHITE, fontFace: BODY, margin: 0, valign: "top" });
-  s.addText(p.rich || p.b, { x: px + 0.22, y: pTop + 1.0, w: pW - 0.44, h: 1.4, fontSize: 11.5, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  s.addText(p.rich || p.b, { x: px + 0.22, y: pTop + 1.0, w: pW - 0.44, h: 1.4, fontSize: 11.5, color: INK, fontFace: BODY, lineSpacingMultiple: 1.12, margin: 0, valign: "top" });
   // output footer inside card
   s.addShape(pres.shapes.LINE, { x: px + 0.22, y: pTop + pH - 0.72, w: pW - 0.44, h: 0, line: { color: LINEC, width: 1 } });
   s.addText([{ text: "OUTPUT  ", options: { bold: true, color: p.opt ? MUTE : TEAL } },
@@ -352,7 +349,7 @@ for (let i = 0; i < 4; i++) {
   const cy = 3.1 + Math.floor(i / 2) * (rqH + rqGap);
   card(s, cx, cy, rqW, rqH, i === 3 ? AMBER : TEAL);
   s.addText(rqs[i][0], { x: cx + 0.22, y: cy + 0.15, w: rqW - 0.4, h: 0.35, fontSize: 13, bold: true, color: i === 3 ? AMBERD : TEAL, fontFace: HEAD, margin: 0 });
-  s.addText(rqs[i][1], { x: cx + 0.22, y: cy + 0.46, w: rqW - 0.4, h: rqH - 0.58, fontSize: 12, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  s.addText(rqs[i][1], { x: cx + 0.22, y: cy + 0.46, w: rqW - 0.4, h: rqH - 0.58, fontSize: 12, color: INK, fontFace: BODY, lineSpacingMultiple: 1.1, margin: 0, valign: "top" });
 }
 
 // BOTTOM — conclusion
