@@ -40,6 +40,78 @@ The presentation should communicate:
 
 ---
 
+## Additional Generation Constraints
+
+This presentation is for a **3-minute academic progress report**, not a final
+defense. The audience already understands basic control concepts.
+
+Slides should optimize for:
+
+- fast understanding
+- clear research positioning
+- feasibility
+
+The presentation should leave the audience with:
+
+> The project is technically meaningful and realistically executable.
+
+### Slide Design Rules
+
+Each slide must satisfy **ONE main message only**, with no more than:
+
+- 25–35 words per content block
+- 3 content blocks per slide
+- 1 main visual
+
+**Avoid:** paragraphs · excessive equations · excessive references · screenshots of papers.
+
+**Prefer:** diagrams · comparison layouts · process flows · simple annotations.
+
+### Speaker Support
+
+For each slide, generate **visible slide content** *and* **hidden speaker notes**.
+
+Speaker notes should contain:
+
+- intended talking points
+- a transition sentence
+- estimated speaking time (target **35–60 sec per slide**)
+
+### Academic Positioning Rules
+
+**Do NOT claim:**
+
+- SATA is adaptive control
+- RL replaces control theory
+- a novel algorithm contribution
+
+**Preferred wording:** *inspired by* · *interpreted through* · *analyzed from* · *preliminary exploration*.
+
+### Visual Communication Rules
+
+- Every **figure** must answer: *Why is this figure shown?*
+- Every **diagram** must answer: *What should the audience learn?*
+
+### Technical Depth Rules
+
+Prioritize: **Problem → Mechanism → Interpretation → Implementation**
+
+Not: Implementation → Framework → Code.
+
+### Deliverables
+
+Generate:
+
+1. Slide outline
+2. Slide content
+3. Speaker notes
+4. Figure suggestions
+5. Citation placement
+
+Do **NOT** generate a final script.
+
+---
+
 ## Slide Count & Pacing
 
 Target: **4 slides (~3 minutes)**
