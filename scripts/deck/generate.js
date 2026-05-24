@@ -69,6 +69,28 @@ function down(s, x, y, color) {
     fontSize: 12, color, margin: 0 });
 }
 
+// ---- icon rendering (react-icons -> PNG) ----------------------------------
+const React = require("react");
+const ReactDOMServer = require("react-dom/server");
+const sharp = require("sharp");
+const FA = require("react-icons/fa");
+const TB = require("react-icons/tb");
+async function icoPng(Comp, hex, size = 256) {
+  const svg = ReactDOMServer.renderToStaticMarkup(React.createElement(Comp, { color: "#" + hex, size: String(size) }));
+  return "image/png;base64," + (await sharp(Buffer.from(svg)).png().toBuffer()).toString("base64");
+}
+function img(s, data, x, y, w, h) { s.addImage({ data, x, y, w, h }); }
+
+(async () => {
+const IC = {};
+const specs = {
+  dogTeal: [FA.FaDog, TEAL], dogClay: [FA.FaDog, CLAY], dogInk: [FA.FaDog, "566460"],
+  arrowR: [FA.FaArrowRight, MUTE], forceDown: [FA.FaArrowDown, CLAY],
+  ok: [FA.FaCheckCircle, TEAL], no: [FA.FaTimesCircle, CLAY],
+  wave: [TB.TbWaveSine, TEAL], dumb: [FA.FaDumbbell, TEAL], batt: [FA.FaBatteryQuarter, AMBERD],
+};
+await Promise.all(Object.entries(specs).map(async ([k, [C, col]]) => { IC[k] = await icoPng(C, col); }));
+
 // ============================================================ TITLE
 let s = pres.addSlide();
 s.background = { color: DARK };
@@ -109,18 +131,36 @@ s = pres.addSlide();
 header(s, 1, "Locomotion Is a Control Problem");
 
 // LEFT — problem card
-card(s, 0.55, 1.45, 5.45, 2.05, CLAY);
-s.addText("THE PROBLEM", { x: 0.8, y: 1.6, w: 5.0, h: 0.35, fontSize: 13, bold: true,
+card(s, 0.55, 1.45, 5.45, 1.5, CLAY);
+s.addText("THE PROBLEM", { x: 0.8, y: 1.58, w: 5.0, h: 0.32, fontSize: 13, bold: true,
   color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
 s.addText("Position-based locomotion is accurate under known conditions but rigid — "
-  + "it struggles with compliance, disturbance handling, unknown terrain, and the "
-  + "sim-to-real gap.",
-  { x: 0.8, y: 1.98, w: 5.0, h: 1.4, fontSize: 15, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  + "it struggles with compliance, disturbances, unknown terrain, and the sim-to-real gap.",
+  { x: 0.8, y: 1.92, w: 5.0, h: 0.95, fontSize: 14, color: INK, fontFace: BODY, margin: 0, valign: "top" });
 
-s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 5.45, h: 0.95, fill: { color: TEALL } });
-s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 0.1, h: 0.95, fill: { color: TEAL } });
-s.addText("→  Torque-based control may improve compliance and provide conditions for more adaptive locomotion.",
-  { x: 0.8, y: 3.66, w: 5.05, h: 0.95, fontSize: 13.5, bold: true, color: TEAL, fontFace: BODY, valign: "middle", margin: 0 });
+// situational scene: rigid control struggles on unknown / soft terrain
+s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.55, y: 3.05, w: 5.45, h: 1.3, fill: { color: "EFEBE3" }, line: { color: LINEC, width: 1 }, rectRadius: 0.06 });
+s.addText("RIGID CONTROL ON UNKNOWN TERRAIN", { x: 0.72, y: 3.1, w: 5.1, h: 0.28, fontSize: 10, bold: true, color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
+// left: firm / known
+s.addShape(pres.shapes.LINE, { x: 0.85, y: 4.02, w: 1.45, h: 0, line: { color: "9A8C7A", width: 3 } });
+img(s, IC.dogTeal, 1.18, 3.42, 0.56, 0.56);
+s.addText("firm · known", { x: 0.75, y: 4.05, w: 1.6, h: 0.26, fontSize: 9.5, color: MUTE, fontFace: BODY, align: "center", margin: 0 });
+// arrow
+img(s, IC.arrowR, 2.5, 3.62, 0.5, 0.36);
+// right: soft / unknown (dipped ground), leg sinks, force arrow, ✗
+s.addShape(pres.shapes.LINE, { x: 3.35, y: 4.02, w: 0.85, h: 0, line: { color: CLAY, width: 3 } });
+s.addShape(pres.shapes.LINE, { x: 4.2, y: 4.02, w: 0.32, h: 0.26, line: { color: CLAY, width: 3 } });
+s.addShape(pres.shapes.LINE, { x: 4.52, y: 4.28, w: 0.3, h: -0.26, line: { color: CLAY, width: 3 } });
+s.addShape(pres.shapes.LINE, { x: 4.82, y: 4.02, w: 0.9, h: 0, line: { color: CLAY, width: 3 } });
+img(s, IC.dogClay, 3.95, 3.42, 0.56, 0.56);
+img(s, IC.forceDown, 4.55, 3.34, 0.3, 0.42);
+img(s, IC.no, 5.42, 3.42, 0.26, 0.26);
+s.addText("soft · unknown", { x: 3.35, y: 4.05, w: 2.4, h: 0.26, fontSize: 9.5, color: CLAY, fontFace: BODY, align: "center", margin: 0 });
+
+// bridge caption
+s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 4.52, w: 0.08, h: 0.62, fill: { color: TEAL } });
+s.addText("→  Torque control may improve compliance, providing conditions for more adaptive locomotion.",
+  { x: 0.75, y: 4.5, w: 5.25, h: 0.66, fontSize: 12.5, bold: true, color: TEAL, fontFace: BODY, valign: "middle", margin: 0 });
 
 // RIGHT — comparison columns
 const colY = 1.45;
@@ -194,13 +234,20 @@ s.addShape(pres.shapes.LINE, { x: rail, y: centers[1], w: 0, h: centers[4] - cen
 s.addShape(pres.shapes.LINE, { x: rail, y: centers[1], w: fx - rail, h: 0, line: { color: AMBER, width: 2.5, endArrowType: "triangle" } }); // rail -> into policy
 s.addText("State feedback\n(base + fatigue)", { x: 0.4, y: (centers[1] + centers[4]) / 2 - 0.45, w: 1.85, h: 0.9,
   align: "right", valign: "middle", fontSize: 12, bold: true, color: AMBERD, fontFace: BODY, margin: 0 });
+img(s, IC.dogInk, fx + 0.5, centers[4] - 0.19, 0.38, 0.38);  // Go2 in the Robot node
 
 // RIGHT — highlight cards
 const hx = 7.05, hw = 5.75;
-card(s, hx, 1.7, hw, 1.5, TEAL);
-chip(s, hx + 0.28, 1.95, 0.55, "M", TEAL, WHITE, 18);
-s.addText("Biomechanical Model", { x: hx + 1.0, y: 1.92, w: hw - 1.2, h: 0.4, fontSize: 18, bold: true, color: TEAL, fontFace: HEAD, margin: 0 });
-s.addText("activation  ·  muscle  ·  fatigue", { x: hx + 1.0, y: 2.4, w: hw - 1.2, h: 0.6, fontSize: 14, color: INK, fontFace: BODY, margin: 0 });
+card(s, hx, 1.7, hw, 1.6, TEAL);
+chip(s, hx + 0.28, 1.92, 0.55, "M", TEAL, WHITE, 18);
+s.addText("Biomechanical Model", { x: hx + 1.0, y: 1.9, w: hw - 1.2, h: 0.4, fontSize: 18, bold: true, color: TEAL, fontFace: HEAD, margin: 0 });
+const micons = [[IC.wave, "activation"], [IC.dumb, "muscle"], [IC.batt, "fatigue"]];
+let mix = hx + 1.0;
+for (const [d, lab] of micons) {
+  img(s, d, mix, 2.55, 0.32, 0.32);
+  s.addText(lab, { x: mix + 0.38, y: 2.55, w: 1.15, h: 0.32, fontSize: 11.5, color: INK, fontFace: BODY, valign: "middle", margin: 0 });
+  mix += 1.55;
+}
 
 card(s, hx, 3.45, hw, 1.5, AMBER);
 chip(s, hx + 0.28, 3.7, 0.55, "G", AMBER, WHITE, 18);
@@ -323,4 +370,6 @@ s.addNotes(
   + "TRANSITION: 'Happy to take questions.'");
 
 const out = path.resolve(__dirname, "../../docs/progress-report-v1.pptx");
-pres.writeFile({ fileName: out }).then(() => console.log("saved", out));
+await pres.writeFile({ fileName: out });
+console.log("saved", out);
+})();
