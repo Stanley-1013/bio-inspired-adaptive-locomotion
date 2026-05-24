@@ -313,8 +313,8 @@ for (let i = 0; i < phases.length; i++) {
 }
 
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 5.55, w: 12.23, h: 0.95, fill: { color: DARK } });
-s.addText("APPROACH", { x: 0.85, y: 5.66, w: 11.6, h: 0.3, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 0.5, margin: 0 });
-s.addText("We analyze adaptation instead of proposing new methods — we do not redesign the RL algorithm.",
+s.addText("FRAMING", { x: 0.85, y: 5.66, w: 11.6, h: 0.3, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 0.5, margin: 0 });
+s.addText("Adaptive control supplies the questions; SATA offers a different kind of answer.",
   { x: 0.85, y: 5.94, w: 11.6, h: 0.45, fontSize: 15.5, bold: true, color: WHITE, fontFace: HEAD, margin: 0 });
 refs(s, "SATA · RL2AC · DecAP");
 s.addNotes(
