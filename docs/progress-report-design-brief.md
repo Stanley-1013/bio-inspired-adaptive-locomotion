@@ -4,13 +4,18 @@
 > presentation must communicate and how it should look, so that Claude Code +
 > a presentation skill can reliably generate the slides in a later step.
 
+> **Status:** original brief, kept as design rationale. The delivered deck
+> (`progress-report-v1.pptx`) has since evolved — Phase 3 is reframed as a
+> **Control Perspective** (adaptive-control questions used as a *lens*, not an
+> "interpretation"), a **title slide** was added, and wording was tightened.
+
 ---
 
 ## Project
 
 **Title:** Bio-inspired Adaptive Locomotion via Torque-based Learning: A Case Study of SATA
 
-**Subtitle (optional):** A simulation-based study from an adaptive control perspective
+**Subtitle (optional):** A simulation-based study using adaptive and robust control questions as a lens
 
 ---
 
@@ -190,7 +195,7 @@ Fatigue Feedback  (loops back)
 **Highlight two blocks**
 
 - **Biomechanical Model:** activation · muscle · fatigue.
-- **Growth Mechanism:** torque limit · reward · frequency.
+- **Growth Mechanism:** torque limit · training curriculum · control frequency.
 
 **Background knowledge to convey**
 
@@ -215,7 +220,7 @@ fatigue, recovery); Bellegarda & Ijspeert (CPG-RL).
 
 ```
 Phase 1            Phase 2            Phase 3                 (Optional)
-Reproduce SATA  →  Ablation        →  Adaptive Interpretation → Residual Compensation
+Reproduce SATA  →  Ablation        →  Control Perspective    → Residual Compensation
 ```
 
 **Per-phase detail**
@@ -225,10 +230,10 @@ Reproduce SATA  →  Ablation        →  Adaptive Interpretation → Residual C
   - Output: simulation running.
 - **Phase 2 — Ablation**
   - Disable fatigue · change torque limit · modify growth schedule · terrain variation.
-- **Phase 3 — Adaptive Interpretation**
-  - Growth → gain scheduling.
-  - Fatigue → feedback.
-  - Torque limit → adaptive constraint.
+- **Phase 3 — Control Perspective** *(questions from adaptive control, as a lens)*
+  - Growth ↔ gain scheduling.
+  - Fatigue ↔ feedback.
+  - Torque modulation ↔ robustness.
 - **Optional — Residual Compensation**
   - `τ_total = τ_SATA + τ_comp`
   - Only if feasible.

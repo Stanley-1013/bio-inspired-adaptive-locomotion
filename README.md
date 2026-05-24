@@ -112,7 +112,7 @@ adaptation between the learned policy and the simulated robot.
 | **1. Reproduction** | Set up the pipeline | Set up server/container; install Isaac Gym + SATA; run `go2_torque` training; verify play in simulation | Working simulation pipeline |
 | **2. Observation & Ablation** | Modify baseline and compare | Toggle fatigue model; change torque limit; modify growth schedule; test different terrains | Behavioral insights & data |
 | **3. Control Perspective** | Use adaptive-control questions as a lens; compare answers | See tables below | Comparison & discussion |
-| **4. Residual Compensation** *(optional, if time allows)* | Explore a lightweight residual term | `T_final = T_SATA + T_residual` to compensate disturbances (friction, payload, terrain change) | Preliminary observations in boundary cases |
+| **4. Residual Compensation** *(optional, if time allows)* | Explore a lightweight residual term | `τ_total = τ_SATA + τ_comp` to compensate disturbances (friction, payload, terrain change) | Preliminary observations in boundary cases |
 
 **Phase 3 — adaptive control supplies the *questions*; SATA gives a different
 kind of *answer*:**
