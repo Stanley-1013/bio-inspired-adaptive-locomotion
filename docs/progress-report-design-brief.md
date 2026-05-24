@@ -34,8 +34,8 @@ The presentation should communicate:
 1. A meaningful **control problem**.
 2. **Why** SATA is chosen.
 3. The planned **simulation methodology**.
-4. How **adaptive control concepts** will be used to *interpret* — not replace —
-   the learning framework.
+4. How **adaptive control questions** will be used as an analytical *lens* — not
+   as a replacement for — the learning framework.
 
 **Tone guardrails**
 
@@ -90,7 +90,7 @@ Speaker notes should contain:
 - RL replaces control theory
 - a novel algorithm contribution
 
-**Preferred wording:** *inspired by* · *interpreted through* · *analyzed from* · *preliminary exploration*.
+**Preferred wording:** *inspired by* · *analyzed from* · *questions used as a lens* · *preliminary exploration*.
 
 ### Visual Communication Rules
 
@@ -99,7 +99,7 @@ Speaker notes should contain:
 
 ### Technical Depth Rules
 
-Prioritize: **Problem → Mechanism → Interpretation → Implementation**
+Prioritize: **Problem → Mechanism → Comparison → Implementation**
 
 Not: Implementation → Framework → Code.
 
@@ -254,18 +254,18 @@ new RL algorithm.
 - **LEFT — Expected Outputs:**
   - Simulation reproduction.
   - Behavior analysis.
-  - Adaptive interpretation.
+  - Control-perspective comparison.
 - **RIGHT — Research Questions:**
   - RQ1: Why torque control?
   - RQ2: What creates adaptation?
-  - RQ3: How does it relate to adaptive control?
+  - RQ3: How does SATA address problems traditionally studied in adaptive control?
   - RQ4: Can lightweight compensation help?
 - **BOTTOM — one-line conclusion.**
 
 **Suggested closing sentence:**
-> This project investigates how bio-inspired torque control creates adaptive
-> locomotion behaviors and interprets these mechanisms through an adaptive
-> control perspective.
+> This project studies how bio-inspired torque control produces adaptive
+> locomotion, and asks how SATA answers questions traditionally posed by
+> adaptive and robust control.
 
 ---
 
@@ -285,4 +285,4 @@ new RL algorithm.
 **Avoid:** equations · architecture screenshots · large tables · RL training curves.
 
 **If a figure is used:** annotate the takeaway. Never show figures without
-interpretation.
+explanation.

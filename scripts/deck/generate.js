@@ -128,7 +128,7 @@ s.addNotes(
   "[~10 sec]\n"
   + "Open: title, course, your name — one breath, then move on.\n"
   + "CORE (set the frame early): We are NOT proposing a new controller. We reproduce SATA, "
-  + "understand its adaptive behavior, and discuss it from a control perspective.\n"
+  + "understand its adaptive behavior, and discuss how it answers adaptive-control questions.\n"
   + "TRANSITION: 'Let me start with why this is a control problem.'");
 
 // ============================================================ SLIDE 1
@@ -204,7 +204,7 @@ refs(s, "SATA · Chen et al. (torque control) · Lee et al. (terrain) · Miki et
 s.addNotes(
   "[~40 sec]\n"
   + "CORE MESSAGE (repeat across the talk): We are NOT proposing a new controller. "
-  + "We aim to reproduce SATA, understand its adaptive behavior, and discuss it from a control perspective.\n"
+  + "We aim to reproduce SATA, understand its adaptive behavior, and discuss how it answers adaptive-control questions.\n"
   + "TALKING POINTS:\n"
   + "- Frame this as a CONTROL problem, not an RL talk.\n"
   + "- Position control commands a joint angle; a low-level PD loop turns the error into torque. Stiff and accurate when the world is known.\n"
@@ -322,7 +322,7 @@ s.addNotes(
   + "- Feasibility is the point of this slide: executable, not just a paper review.\n"
   + "- Phase 1: stand up the official SATA pipeline in Isaac Gym — proves we can run it.\n"
   + "- Phase 2: controlled ablations — toggle fatigue, retune torque limit / growth, change terrain; observe behavior shifts.\n"
-  + "- Phase 3: map each mechanism to an adaptive-control reading (analogy, not equivalence).\n"
+  + "- Phase 3: compare each mechanism with the adaptive-control question it echoes (analogy, not equivalence).\n"
   + "- Phase 4 residual term only if time allows — not promised.\n"
   + "TRANSITION: 'So what do we expect to deliver?'");
 
@@ -367,10 +367,10 @@ s.addText("This project studies how bio-inspired torque control produces adaptiv
 s.addNotes(
   "[~30 sec]\nTALKING POINTS:\n"
   + "- Close the loop, no overclaiming: the contribution is understanding, not a new algorithm.\n"
-  + "- Three concrete outputs: reproduction, behavior analysis, control-theoretic interpretation.\n"
+  + "- Three concrete outputs: reproduction, behavior analysis, control-perspective comparison.\n"
   + "- The four research questions map onto the four slides.\n"
-  + "CLOSING LINE (read the bottom band): bio-inspired torque control -> adaptive behavior -> interpreted through adaptive & robust control.\n"
-  + "REINFORCE THE CORE: we are not proposing a new controller — reproduce SATA, understand its adaptive behavior, discuss it from a control perspective.\n"
+  + "CLOSING LINE (read the bottom band): bio-inspired torque control -> adaptive behavior -> answers questions posed by adaptive & robust control.\n"
+  + "REINFORCE THE CORE: we are not proposing a new controller — reproduce SATA, understand its adaptive behavior, discuss how it answers adaptive-control questions.\n"
   + "TRANSITION: 'Happy to take questions.'");
 
 const out = path.resolve(__dirname, "../../docs/20260525_progress_report_v1.pptx");

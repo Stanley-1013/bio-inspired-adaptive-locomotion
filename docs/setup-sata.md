@@ -90,5 +90,5 @@ python scripts/play.py --task=go2_torque
 |-------|----------------------|
 | 1. Reproduce | Steps 1–5 above → "simulation running" |
 | 2. Ablation | Edit `go2_torque_config.py`: toggle fatigue, change torque limit, modify growth schedule; vary terrain |
-| 3. Adaptive interpretation | Analyze the above behaviors; map mechanisms to control concepts (analogies) |
+| 3. Control perspective | Compare the observed behaviors with the questions adaptive control asks (a lens, not equivalence) |
 | 4. (Optional) Residual compensation | Preliminary exploration only, if time allows |
