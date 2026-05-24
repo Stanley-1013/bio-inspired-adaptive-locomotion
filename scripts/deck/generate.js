@@ -139,20 +139,22 @@ s.addText("Position-based locomotion is accurate under known conditions but rigi
   { x: 0.8, y: 1.92, w: 5.0, h: 0.95, fontSize: 14, color: INK, fontFace: BODY, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
 
 // situational scene: rigid control struggles on unknown / soft terrain
-s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.55, y: 3.05, w: 5.45, h: 1.3, fill: { color: "EFEBE3" }, line: { color: LINEC, width: 1 }, rectRadius: 0.06 });
+s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 0.55, y: 3.05, w: 5.45, h: 1.36, fill: { color: "EFEBE3" }, line: { color: LINEC, width: 1 }, rectRadius: 0.06 });
 s.addText("RIGID CONTROL ON UNKNOWN TERRAIN", { x: 0.72, y: 3.12, w: 5.1, h: 0.26, fontSize: 10, bold: true, color: CLAY, fontFace: BODY, charSpacing: 0.5, margin: 0 });
 // left: firm / known (solid ground)
 img(s, IC.dogTeal, 1.2, 3.46, 0.56, 0.56);
-s.addShape(pres.shapes.LINE, { x: 0.8, y: 4.05, w: 1.55, h: 0, line: { color: "9A8C7A", width: 3 } });
-s.addText("firm · known", { x: 0.7, y: 4.09, w: 1.75, h: 0.24, fontSize: 10, color: MUTE, fontFace: BODY, align: "center", margin: 0 });
+s.addShape(pres.shapes.LINE, { x: 0.8, y: 4.04, w: 1.55, h: 0, line: { color: "9A8C7A", width: 3 } });
+s.addText("firm · known", { x: 0.7, y: 4.18, w: 1.75, h: 0.22, fontSize: 10, color: MUTE, fontFace: BODY, align: "center", margin: 0 });
 // arrow
 img(s, IC.arrowR, 2.62, 3.66, 0.5, 0.34);
-// right: soft / unknown (loose dashed ground) + excessive force
-img(s, IC.dogClay, 3.95, 3.46, 0.56, 0.56);
-img(s, IC.forceDown, 4.64, 3.28, 0.28, 0.4);
-img(s, IC.no, 5.52, 3.48, 0.24, 0.24);
-s.addShape(pres.shapes.LINE, { x: 3.45, y: 4.05, w: 2.25, h: 0, line: { color: CLAY, width: 3, dashType: "dash" } });
-s.addText("soft · unknown", { x: 3.55, y: 4.09, w: 2.05, h: 0.24, fontSize: 10, color: CLAY, fontFace: BODY, align: "center", margin: 0 });
+// right: soft / unknown (loose dashed ground that sags where the leg steps) + excessive force
+img(s, IC.dogClay, 3.95, 3.54, 0.56, 0.56);
+img(s, IC.forceDown, 4.64, 3.32, 0.28, 0.4);
+img(s, IC.no, 5.52, 3.5, 0.24, 0.24);
+s.addShape(pres.shapes.LINE, { x: 3.45, y: 4.04, w: 0.75, h: 0.09, line: { color: CLAY, width: 3, dashType: "dash" } });
+s.addShape(pres.shapes.LINE, { x: 4.20, y: 4.13, w: 0.58, h: 0, line: { color: CLAY, width: 3, dashType: "dash" } });
+s.addShape(pres.shapes.LINE, { x: 4.78, y: 4.13, w: 0.92, h: -0.09, line: { color: CLAY, width: 3, dashType: "dash" } });
+s.addText("soft · unknown", { x: 3.55, y: 4.18, w: 2.05, h: 0.22, fontSize: 10, color: CLAY, fontFace: BODY, align: "center", margin: 0 });
 
 // bridge caption
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 4.52, w: 0.08, h: 0.62, fill: { color: TEAL } });
