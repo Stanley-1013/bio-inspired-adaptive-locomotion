@@ -78,10 +78,10 @@ s.addText("Position-based locomotion is accurate under known conditions but rigi
   + "sim-to-real gap.",
   { x: 0.8, y: 1.98, w: 5.0, h: 1.4, fontSize: 15, color: INK, fontFace: BODY, margin: 0, valign: "top" });
 
-s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.7, w: 5.45, h: 0.78, fill: { color: TEALL } });
-s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.7, w: 0.1, h: 0.78, fill: { color: TEAL } });
-s.addText("→  Torque-based control enables compliant, adaptive interaction.",
-  { x: 0.8, y: 3.7, w: 5.1, h: 0.78, fontSize: 14, bold: true, color: TEAL, fontFace: BODY, valign: "middle", margin: 0 });
+s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 5.45, h: 0.95, fill: { color: TEALL } });
+s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 0.1, h: 0.95, fill: { color: TEAL } });
+s.addText("→  Torque-based control may enable more compliant interaction and improve adaptation capability.",
+  { x: 0.8, y: 3.66, w: 5.05, h: 0.95, fontSize: 13.5, bold: true, color: TEAL, fontFace: BODY, valign: "middle", margin: 0 });
 
 // RIGHT — comparison columns
 const colY = 1.45;
@@ -113,9 +113,14 @@ s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 5.5, w: 12.23, h: 1.0, fill: { c
 s.addText("RESEARCH QUESTION", { x: 0.85, y: 5.62, w: 11.6, h: 0.3, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 2, margin: 0 });
 s.addText("How can robots achieve safer and more adaptive locomotion in unknown environments?",
   { x: 0.85, y: 5.9, w: 11.6, h: 0.5, fontSize: 18, bold: true, color: WHITE, fontFace: HEAD, margin: 0 });
+s.addText("Adaptive behavior  ≠  adaptive control", { x: 6.3, y: 4.95, w: 6.5, h: 0.4,
+  fontSize: 12.5, italic: true, color: MUTE, fontFace: BODY, align: "right", margin: 0 });
 refs(s, "SATA · Chen et al. (torque control) · Lee et al. (terrain) · Miki et al. (perceptive loco.)");
 s.addNotes(
-  "[~40 sec]\nTALKING POINTS:\n"
+  "[~40 sec]\n"
+  + "CORE MESSAGE (repeat across the talk): We are NOT proposing a new controller. "
+  + "We aim to reproduce SATA, understand its adaptive behavior, and discuss it from a control perspective.\n"
+  + "TALKING POINTS:\n"
   + "- Frame this as a CONTROL problem, not an RL talk.\n"
   + "- Position control commands a joint angle; a low-level PD loop turns the error into torque. Stiff and accurate when the world is known.\n"
   + "- It fails on exactly what this course cares about: compliance, disturbance rejection, unknown terrain, sim-to-real gap.\n"
@@ -144,7 +149,7 @@ for (let i = 0; i < nodes.length; i++) {
 // feedback arrow (up) on the left
 s.addShape(pres.shapes.LINE, { x: 2.4, y: centers[1], w: 0, h: centers[4] - centers[1],
   line: { color: AMBER, width: 2.5, beginArrowType: "triangle" } });
-s.addText("Fatigue\nfeedback", { x: 0.55, y: (centers[1] + centers[4]) / 2 - 0.45, w: 1.7, h: 0.9,
+s.addText("State feedback\n(base + fatigue)", { x: 0.4, y: (centers[1] + centers[4]) / 2 - 0.45, w: 1.85, h: 0.9,
   align: "right", valign: "middle", fontSize: 12, bold: true, color: AMBERD, fontFace: BODY, margin: 0 });
 
 // RIGHT — highlight cards
@@ -157,9 +162,9 @@ s.addText("activation  ·  muscle  ·  fatigue", { x: hx + 1.0, y: 2.4, w: hw - 
 card(s, hx, 3.45, hw, 1.5, AMBER);
 chip(s, hx + 0.28, 3.7, 0.55, "G", AMBER, WHITE, 18);
 s.addText("Growth Mechanism", { x: hx + 1.0, y: 3.67, w: hw - 1.2, h: 0.4, fontSize: 18, bold: true, color: AMBERD, fontFace: HEAD, margin: 0 });
-s.addText("torque limit  ·  reward  ·  frequency", { x: hx + 1.0, y: 4.15, w: hw - 1.2, h: 0.6, fontSize: 14, color: INK, fontFace: BODY, margin: 0 });
+s.addText("torque limit  ·  training curriculum  ·  control frequency", { x: hx + 1.0, y: 4.12, w: hw - 1.2, h: 0.7, fontSize: 14, color: INK, fontFace: BODY, margin: 0, valign: "top" });
 
-s.addText("Goal: smooth, safe torques that progressively unlock capability — deployed zero-shot (sim-to-real).",
+s.addText("Goal: smooth, safe torques that progressively unlock capability — demonstrated zero-shot deployment (sim-to-real).",
   { x: hx, y: 5.2, w: hw, h: 0.9, fontSize: 13, italic: true, color: MUTE, fontFace: BODY, margin: 0, valign: "top" });
 refs(s, "SATA · Hill (muscle dynamics) · Liu et al. (fatigue) · Bellegarda & Ijspeert (CPG-RL)");
 s.addNotes(
@@ -179,8 +184,8 @@ caption(s, 1.18, "A feasible 3-phase study — we interpret SATA, we do not rede
 const phases = [
   { n: "1", t: "Reproduce", c: TEAL, b: "Set up Isaac Gym on a CUDA server (container / venv) and run the official SATA training.", out: "simulation running", opt: false },
   { n: "2", t: "Ablation", c: TEAL, b: "Disable fatigue · change torque limit · modify growth schedule · vary terrain.", out: "behavioral data", opt: false },
-  { n: "3", t: "Adaptive Interpretation", c: TEAL, b: "Growth → gain scheduling\nFatigue → feedback\nTorque limit → adaptive constraint", out: "analysis & discussion", opt: false },
-  { n: "4", t: "Residual Compensation", c: AMBER, b: "τ_total = τ_SATA + τ_comp\nPursue only if feasible.", out: "robustness in boundary cases", opt: true },
+  { n: "3", t: "Adaptive Interpretation", c: TEAL, b: "Growth ↔ gain scheduling\nFatigue ↔ internal feedback\nTorque limit ↔ adaptive constraint\n\n(analogies, not claims)", out: "analysis & discussion", opt: false },
+  { n: "4", t: "Residual Compensation", c: AMBER, b: "Preliminary exploration.\nτ_total = τ_SATA + τ_comp\n\nOnly if time & feasibility allow.", out: "preliminary observations", opt: true },
 ];
 const pTop = 1.7, pH = 3.15, pW = 2.86, pGap = 0.3;
 let px = 0.55;
@@ -191,7 +196,7 @@ for (let i = 0; i < phases.length; i++) {
   chip(s, px + 0.18, pTop + 0.17, 0.5, p.n, WHITE, p.c, 18);
   s.addText(p.opt ? "PHASE 4 · OPTIONAL" : "PHASE " + p.n, { x: px + 0.8, y: pTop + 0.13, w: pW - 0.9, h: 0.28, fontSize: 9.5, bold: true, color: WHITE, fontFace: BODY, charSpacing: 1, margin: 0 });
   s.addText(p.t, { x: px + 0.8, y: pTop + 0.4, w: pW - 0.9, h: 0.4, fontSize: 14, bold: true, color: WHITE, fontFace: BODY, margin: 0, valign: "top" });
-  s.addText(p.b, { x: px + 0.22, y: pTop + 1.02, w: pW - 0.44, h: 1.35, fontSize: 12.5, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  s.addText(p.b, { x: px + 0.22, y: pTop + 1.0, w: pW - 0.44, h: 1.4, fontSize: 12, color: INK, fontFace: BODY, margin: 0, valign: "top" });
   // output footer inside card
   s.addShape(pres.shapes.LINE, { x: px + 0.22, y: pTop + pH - 0.72, w: pW - 0.44, h: 0, line: { color: LINEC, width: 1 } });
   s.addText([{ text: "OUTPUT  ", options: { bold: true, color: p.opt ? AMBERD : TEAL } },
@@ -204,8 +209,8 @@ for (let i = 0; i < phases.length; i++) {
 
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 5.55, w: 12.23, h: 0.95, fill: { color: DARK } });
 s.addText("APPROACH", { x: 0.85, y: 5.66, w: 11.6, h: 0.3, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 2, margin: 0 });
-s.addText("We understand and analyze adaptive behavior — we do not redesign the RL algorithm.",
-  { x: 0.85, y: 5.94, w: 11.6, h: 0.45, fontSize: 16, bold: true, color: WHITE, fontFace: HEAD, margin: 0 });
+s.addText("We analyze adaptation instead of proposing new methods — we do not redesign the RL algorithm.",
+  { x: 0.85, y: 5.94, w: 11.6, h: 0.45, fontSize: 15.5, bold: true, color: WHITE, fontFace: HEAD, margin: 0 });
 refs(s, "SATA · RL2AC · DecAP");
 s.addNotes(
   "[~50 sec]\nTALKING POINTS:\n"
@@ -227,12 +232,13 @@ s.addText("We study adaptive behavior — not propose a new RL algorithm.",
 
 // LEFT — expected outputs
 s.addText("EXPECTED OUTPUTS", { x: 0.55, y: 2.55, w: 5.9, h: 0.4, fontSize: 15, bold: true, color: DARK, fontFace: BODY, charSpacing: 1.5, margin: 0 });
-const outs = ["Simulation reproduction", "Behavior analysis (ablation)", "Adaptive-control interpretation"];
-let oy = 3.1;
+const outs = ["Simulation reproduction", "Behavior analysis (ablation)",
+              "Adaptive-control interpretation", "Literature-grounded discussion"];
+let oy = 3.05;
 for (let i = 0; i < outs.length; i++) {
-  chip(s, 0.6, oy, 0.45, i + 1, TEAL, WHITE, 15);
-  s.addText(outs[i], { x: 1.2, y: oy, w: 5.2, h: 0.45, fontSize: 15, color: INK, fontFace: BODY, valign: "middle", margin: 0 });
-  oy += 0.85;
+  chip(s, 0.6, oy, 0.42, i + 1, TEAL, WHITE, 14);
+  s.addText(outs[i], { x: 1.18, y: oy, w: 5.3, h: 0.42, fontSize: 15, color: INK, fontFace: BODY, valign: "middle", margin: 0 });
+  oy += 0.74;
 }
 
 // RIGHT — research questions (2x2)
@@ -251,15 +257,16 @@ for (let i = 0; i < 4; i++) {
 // BOTTOM — conclusion
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 6.15, w: 12.23, h: 1.0, fill: { color: DARK } });
 s.addText("IN ONE LINE", { x: 0.85, y: 6.26, w: 11.6, h: 0.28, fontSize: 11, bold: true, color: AMBER, fontFace: BODY, charSpacing: 2, margin: 0 });
-s.addText("This project investigates how bio-inspired torque control creates adaptive locomotion behaviors, and interprets these mechanisms through an adaptive control perspective.",
+s.addText("This project investigates how bio-inspired torque control creates adaptive locomotion behaviors, and interprets these mechanisms through adaptive and robust control perspectives.",
   { x: 0.85, y: 6.52, w: 11.6, h: 0.55, fontSize: 14, bold: true, color: WHITE, fontFace: BODY, margin: 0, valign: "top" });
 s.addNotes(
   "[~30 sec]\nTALKING POINTS:\n"
   + "- Close the loop, no overclaiming: the contribution is understanding, not a new algorithm.\n"
   + "- Three concrete outputs: reproduction, behavior analysis, control-theoretic interpretation.\n"
   + "- The four research questions map onto the four slides.\n"
-  + "CLOSING LINE (read the bottom band): bio-inspired torque control -> adaptive behavior -> interpreted through adaptive control.\n"
+  + "CLOSING LINE (read the bottom band): bio-inspired torque control -> adaptive behavior -> interpreted through adaptive & robust control.\n"
+  + "REINFORCE THE CORE: we are not proposing a new controller — reproduce SATA, understand its adaptive behavior, discuss it from a control perspective.\n"
   + "TRANSITION: 'Happy to take questions.'");
 
-const out = path.resolve(__dirname, "../../docs/progress-report-v0.pptx");
+const out = path.resolve(__dirname, "../../docs/progress-report-v1.pptx");
 pres.writeFile({ fileName: out }).then(() => console.log("saved", out));
