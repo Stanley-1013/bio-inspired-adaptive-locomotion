@@ -1,15 +1,21 @@
-# Bio-inspired Adaptive Locomotion via Torque-based Learning: A Case Study of SATA
+# Bio-inspired Adaptive Locomotion via Torque-based Learning
+
+**A Case Study of SATA**
 
 *A simulation-based study using adaptive and robust control questions as a lens.*
 
-This project reproduces and analyzes SATA:
+This project reproduces and studies **SATA** (Safe and Adaptive Torque-Based
+Locomotion Policies Inspired by Animal Learning; Li et al., RSS 2025).
 
-Li et al.,
-"Safe and Adaptive Torque-Based Locomotion Policies Inspired by Animal Learning"
+Rather than proposing a new controller, this work investigates how bio-inspired
+torque control creates adaptive locomotion behaviors, and discusses these
+mechanisms through **adaptive and robust control questions**.
 
 Official implementation: https://github.com/marmotlab/SATA
 
 This repository is intended for educational and research purposes.
+
+**Keywords:** Embodied AI · Adaptive Control · RL · Torque Control · Locomotion
 
 ---
 
