@@ -127,18 +127,16 @@ Lyapunov-based update law or online parameter estimation.*
 
 ## 8. Key References
 
-1. **SATA** — Safe and Adaptive Torque-based Locomotion Policies Inspired by
-   Animal Learning (RSS 2025).
-2. Reinforcement learning for adaptive control of legged robots.
-3. Hwangbo et al. — Learning agile and dynamic motor skills for legged robots.
-4. Lee et al. — Learning quadrupedal locomotion over challenging terrain.
-5. Miki et al. — Learning robust perceptive locomotion for quadrupedal robots
-   in the wild.
-6. Chen et al. — Learning torque control for quadrupedal locomotion.
-7. Decaying action priors for torque-based legged locomotion.
-8. Hill, A. V. — The heat of shortening and the dynamic constants of muscle.
-9. Muscle fatigue modeling literature.
-10. CPG-RL — Learning-based hierarchical control of locomotion.
+1. SATA: Safe and Adaptive Torque-Based Locomotion Policies Inspired by Animal Learning (RSS 2025)
+2. RL2AC: Reinforcement Learning-based Rapid Online Adaptive Control for Legged Robot Robust Locomotion
+3. Hwangbo et al., Learning agile and dynamic motor skills for legged robots
+4. Lee et al., Learning quadrupedal locomotion over challenging terrain
+5. Miki et al., Learning robust perceptive locomotion for quadrupedal robots in the wild
+6. Chen et al., Learning Torque Control for Quadrupedal Locomotion
+7. DeCAP: Decaying Action Priors for Torque-Based Legged Locomotion
+8. Hill, A. V., The heat of shortening and the dynamic constants of muscle
+9. Muscle fatigue literature
+10. CPG-RL / Learning-based hierarchical control literature
 
 ---
 
