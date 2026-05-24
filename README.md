@@ -1,6 +1,6 @@
 # Bio-inspired Adaptive Locomotion via Torque-based Learning: A Case Study of SATA
 
-*A simulation-based analysis from an adaptive control perspective.*
+*A simulation-based study using adaptive and robust control questions as a lens.*
 
 This project reproduces and analyzes SATA:
 
