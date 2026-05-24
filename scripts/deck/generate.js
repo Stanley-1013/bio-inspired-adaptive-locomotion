@@ -119,7 +119,7 @@ s.addText("Position-based locomotion is accurate under known conditions but rigi
 
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 5.45, h: 0.95, fill: { color: TEALL } });
 s.addShape(pres.shapes.RECTANGLE, { x: 0.55, y: 3.66, w: 0.1, h: 0.95, fill: { color: TEAL } });
-s.addText("→  Torque-based control may enable more compliant interaction and improve adaptation capability.",
+s.addText("→  Torque-based control may improve compliance and provide conditions for more adaptive locomotion.",
   { x: 0.8, y: 3.66, w: 5.05, h: 0.95, fontSize: 13.5, bold: true, color: TEAL, fontFace: BODY, valign: "middle", margin: 0 });
 
 // RIGHT — comparison columns
@@ -209,7 +209,7 @@ s.addText("torque limit  ·  training curriculum  ·  control frequency", { x: h
 
 s.addShape(pres.shapes.RECTANGLE, { x: hx, y: 5.15, w: hw, h: 0.95, fill: { color: "ECF1F0" }, line: { color: LINEC, width: 1 } });
 s.addText([{ text: "Goal:  ", options: { bold: true, color: TEAL } },
-           { text: "smooth, safe torques that progressively unlock capability — demonstrated zero-shot deployment (sim-to-real).", options: {} }],
+           { text: "smoother torque generation and improved robustness through bio-inspired adaptation.", options: {} }],
   { x: hx + 0.18, y: 5.15, w: hw - 0.36, h: 0.95, fontSize: 13, color: INK, fontFace: BODY, margin: 0, valign: "middle" });
 refs(s, "SATA · Hill (muscle dynamics) · Liu et al. (fatigue) · Bellegarda & Ijspeert (CPG-RL)");
 s.addNotes(
@@ -218,7 +218,7 @@ s.addNotes(
   + "- Flow: observation -> RL torque policy -> biomechanical layer -> torque -> robot; fatigue state feeds back.\n"
   + "- Biomechanical model: activation smooths the command, a muscle model prevents abrupt torque, fatigue discourages overusing joints.\n"
   + "- Growth mechanism: torque limit, reward, and control frequency unlock progressively — like an animal maturing.\n"
-  + "- Net effect: safe torques plus generalization, deployed zero-shot.\n"
+  + "- Net effect: smoother, more robust torques plus generalization, demonstrated zero-shot.\n"
   + "TRANSITION: 'That's what SATA is — here is how WE plan to study it.'");
 
 // ============================================================ SLIDE 3
@@ -229,7 +229,7 @@ caption(s, 1.18, "A feasible 3-phase study, with an optional extension — we in
 const phases = [
   { n: "1", t: "Reproduce", c: TEAL, b: "Set up Isaac Gym on a CUDA server (container / venv) and run the official SATA training.", out: "simulation running", opt: false },
   { n: "2", t: "Ablation", c: TEAL, b: "Disable fatigue · change torque limit · modify growth schedule · vary terrain.", out: "behavioral data", opt: false },
-  { n: "3", t: "Adaptive Interpretation", c: TEAL, b: "Growth ↔ gain scheduling\nFatigue ↔ internal feedback\nTorque limit ↔ adaptive constraint\n\n(analogies, not claims)", out: "analysis & discussion", opt: false },
+  { n: "3", t: "Adaptive Interpretation", c: TEAL, b: "Growth ↔ gain scheduling\nFatigue ↔ internal feedback\nTorque limit ↔ progressive constraint modulation\n\n(analogies, not claims)", out: "analysis & discussion", opt: false },
   { n: "4", t: "Residual Compensation", c: "8E9B98", out: "preliminary observations", opt: true,
     rich: [
       { text: "Preliminary exploration.", options: { breakLine: true } },
@@ -245,12 +245,12 @@ const pTop = 1.7, pH = 3.15, pW = 2.86, pGap = 0.3;
 let px = 0.55;
 for (let i = 0; i < phases.length; i++) {
   const p = phases[i];
-  s.addShape(pres.shapes.RECTANGLE, { x: px, y: pTop, w: pW, h: pH, fill: { color: WHITE }, line: { color: p.opt ? MUTE : LINEC, width: 1, dashType: p.opt ? "dash" : "solid" }, shadow: sh() });
+  s.addShape(pres.shapes.RECTANGLE, { x: px, y: pTop, w: pW, h: pH, fill: { color: WHITE }, line: { color: LINEC, width: 1 }, shadow: sh() });
   s.addShape(pres.shapes.RECTANGLE, { x: px, y: pTop, w: pW, h: 0.85, fill: { color: p.c } });
   chip(s, px + 0.18, pTop + 0.17, 0.5, p.n, WHITE, p.c, 18);
   s.addText(p.opt ? "PHASE 4 · OPTIONAL" : "PHASE " + p.n, { x: px + 0.8, y: pTop + 0.13, w: pW - 0.9, h: 0.28, fontSize: 9.5, bold: true, color: WHITE, fontFace: BODY, charSpacing: 0.5, margin: 0 });
   s.addText(p.t, { x: px + 0.8, y: pTop + 0.4, w: pW - 0.9, h: 0.4, fontSize: 14, bold: true, color: WHITE, fontFace: BODY, margin: 0, valign: "top" });
-  s.addText(p.rich || p.b, { x: px + 0.22, y: pTop + 1.0, w: pW - 0.44, h: 1.4, fontSize: 12, color: INK, fontFace: BODY, margin: 0, valign: "top" });
+  s.addText(p.rich || p.b, { x: px + 0.22, y: pTop + 1.0, w: pW - 0.44, h: 1.4, fontSize: 11.5, color: INK, fontFace: BODY, margin: 0, valign: "top" });
   // output footer inside card
   s.addShape(pres.shapes.LINE, { x: px + 0.22, y: pTop + pH - 0.72, w: pW - 0.44, h: 0, line: { color: LINEC, width: 1 } });
   s.addText([{ text: "OUTPUT  ", options: { bold: true, color: p.opt ? MUTE : TEAL } },
