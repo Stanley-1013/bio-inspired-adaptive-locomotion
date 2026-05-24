@@ -46,7 +46,7 @@ scripts/  setup + deck-build scripts, and the pptxgenjs deck generator
 .claude/  SessionStart hook (auto-runs scripts/setup.sh on web sessions)
 ```
 
-- **Progress report:** `docs/progress-report-v1.pptx` / `.pdf`
+- **Progress report:** `docs/20260525_progress_report_v1.pptx` / `.pdf`
   (spec in `docs/progress-report-design-brief.md`).
 - **Reproduce SATA (needs a GPU box):** see `docs/setup-sata.md`.
 - **Rebuild the deck:** `bash scripts/setup.sh` then `bash scripts/build-deck.sh`.

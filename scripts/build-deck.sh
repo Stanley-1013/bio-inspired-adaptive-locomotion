@@ -6,13 +6,13 @@ cd "$(dirname "$0")/.."
 echo "[deck] generating pptx…"
 node scripts/deck/generate.js
 
-PPTX="$(pwd)/docs/progress-report-v1.pptx"
+PPTX="$(pwd)/docs/20260525_progress_report_v1.pptx"
 echo "[deck] exporting pdf via LibreOffice…"
 if command -v soffice >/dev/null 2>&1; then
   HOME="${HOME:-/root}" soffice --headless --norestore \
     -env:UserInstallation=file:///tmp/lo-deck \
     --convert-to pdf --outdir docs "$PPTX" >/dev/null
-  echo "[deck] wrote docs/progress-report-v1.pdf"
+  echo "[deck] wrote docs/20260525_progress_report_v1.pdf"
 else
   echo "[deck] WARN: soffice not found — run scripts/setup.sh first."
 fi

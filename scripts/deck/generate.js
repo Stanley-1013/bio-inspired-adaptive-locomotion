@@ -45,11 +45,11 @@ function card(s, x, y, w, h, accent) {
   s.addShape(pres.shapes.RECTANGLE, { x, y, w: 0.1, h, fill: { color: accent } });
 }
 
-function header(s, n, title) {
+function header(s, n, title, fs = 25) {
   s.background = { color: CREAM };
   s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 13.33, h: 1.05, fill: { color: DARK } });
   chip(s, 0.5, 0.27, 0.52, n, AMBER, DARK, 22);
-  s.addText(title, { x: 1.22, y: 0.16, w: 11.6, h: 0.72, fontSize: 25, bold: true,
+  s.addText(title, { x: 1.22, y: 0.16, w: 11.7, h: 0.72, fontSize: fs, bold: true,
     color: WHITE, fontFace: HEAD, valign: "middle", margin: 0 });
 }
 
@@ -112,13 +112,18 @@ s.addText("PROGRESS REPORT   ·   ADAPTIVE CONTROL SYSTEMS",
   { x: 1.5, y: 0.9, w: 9.0, h: 0.45, fontSize: 12.5, bold: true, color: AMBER, fontFace: BODY, charSpacing: 1, valign: "middle", margin: 0 });
 
 s.addText("Bio-inspired Adaptive Locomotion\nvia Torque-based Learning",
-  { x: 0.7, y: 2.7, w: 8.7, h: 1.4, fontSize: 31, bold: true, color: WHITE, fontFace: HEAD, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
+  { x: 0.7, y: 2.5, w: 8.7, h: 1.4, fontSize: 31, bold: true, color: WHITE, fontFace: HEAD, lineSpacingMultiple: 1.08, margin: 0, valign: "top" });
 s.addText("A Case Study of SATA",
-  { x: 0.72, y: 4.0, w: 8.4, h: 0.5, fontSize: 20, italic: true, color: ICE, fontFace: HEAD, margin: 0 });
+  { x: 0.72, y: 3.78, w: 8.4, h: 0.45, fontSize: 20, italic: true, color: ICE, fontFace: HEAD, margin: 0 });
+s.addText("Safe and Adaptive Torque-Based Locomotion Policies Inspired by Animal Learning",
+  { x: 0.72, y: 4.24, w: 8.5, h: 0.4, fontSize: 12, italic: true, color: "8FA6A3", fontFace: BODY, margin: 0 });
 
 s.addShape(pres.shapes.RECTANGLE, { x: 0.74, y: 4.85, w: 2.0, h: 0.05, fill: { color: AMBER } });
-s.addText("Chuan-Han Li", { x: 0.7, y: 5.1, w: 8, h: 0.45, fontSize: 17, bold: true, color: WHITE, fontFace: BODY, margin: 0 });
-s.addText("2026 / 05 / 25", { x: 0.7, y: 5.57, w: 8, h: 0.4, fontSize: 14, color: MUTE, fontFace: BODY, margin: 0 });
+s.addText("Chuan-Han Li", { x: 0.7, y: 5.08, w: 8, h: 0.45, fontSize: 17, bold: true, color: WHITE, fontFace: BODY, margin: 0 });
+s.addText("2026 / 05 / 25", { x: 0.7, y: 5.54, w: 8, h: 0.4, fontSize: 14, color: MUTE, fontFace: BODY, margin: 0 });
+s.addText([{ text: "Main reference:  ", options: { bold: true, color: AMBER } },
+           { text: "Li et al., SATA (RSS 2025)", options: { color: MUTE } }],
+  { x: 0.7, y: 6.96, w: 9.0, h: 0.35, fontSize: 11, italic: true, fontFace: BODY, margin: 0 });
 s.addNotes(
   "[~10 sec]\n"
   + "Open: title, course, your name — one breath, then move on.\n"
@@ -209,7 +214,7 @@ s.addNotes(
 
 // ============================================================ SLIDE 2
 s = pres.addSlide();
-header(s, 2, "SATA: Bio-inspired Adaptation in Torque Control");
+header(s, 2, "SATA Framework: Bio-inspired Adaptation in Torque Control", 22);
 caption(s, 1.18, "An RL torque policy wrapped by a biomechanical layer and a growth curriculum.");
 
 // LEFT — vertical flow
@@ -368,7 +373,7 @@ s.addNotes(
   + "REINFORCE THE CORE: we are not proposing a new controller — reproduce SATA, understand its adaptive behavior, discuss it from a control perspective.\n"
   + "TRANSITION: 'Happy to take questions.'");
 
-const out = path.resolve(__dirname, "../../docs/progress-report-v1.pptx");
+const out = path.resolve(__dirname, "../../docs/20260525_progress_report_v1.pptx");
 await pres.writeFile({ fileName: out });
 console.log("saved", out);
 })();
