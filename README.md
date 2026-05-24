@@ -127,16 +127,16 @@ Lyapunov-based update law or online parameter estimation.*
 
 ## 8. Key References
 
-1. SATA: Safe and Adaptive Torque-Based Locomotion Policies Inspired by Animal Learning (RSS 2025)
-2. RL2AC: Reinforcement Learning-based Rapid Online Adaptive Control for Legged Robot Robust Locomotion
-3. Hwangbo et al., Learning agile and dynamic motor skills for legged robots
-4. Lee et al., Learning quadrupedal locomotion over challenging terrain
-5. Miki et al., Learning robust perceptive locomotion for quadrupedal robots in the wild
-6. Chen et al., Learning Torque Control for Quadrupedal Locomotion
-7. DeCAP: Decaying Action Priors for Torque-Based Legged Locomotion
-8. Hill, A. V., The heat of shortening and the dynamic constants of muscle
-9. Muscle fatigue literature
-10. CPG-RL / Learning-based hierarchical control literature
+1. SATA: Safe and Adaptive Torque-Based Locomotion Policies Inspired by Animal Learning (RSS 2025). [arXiv:2502.12674](https://arxiv.org/abs/2502.12674)
+2. RL2AC: Reinforcement Learning-based Rapid Online Adaptive Control for Legged Robot Robust Locomotion (RSS 2024). [Proceedings](https://www.roboticsproceedings.org/rss20/p060.html)
+3. Hwangbo et al., Learning agile and dynamic motor skills for legged robots (Science Robotics, 2019). [arXiv:1901.08652](https://arxiv.org/abs/1901.08652)
+4. Lee et al., Learning quadrupedal locomotion over challenging terrain (Science Robotics, 2020). [arXiv:2010.11251](https://arxiv.org/abs/2010.11251)
+5. Miki et al., Learning robust perceptive locomotion for quadrupedal robots in the wild (Science Robotics, 2022). [arXiv:2201.08117](https://arxiv.org/abs/2201.08117)
+6. Chen et al., Learning Torque Control for Quadrupedal Locomotion (2022). [arXiv:2203.05194](https://arxiv.org/abs/2203.05194)
+7. DecAP: Decaying Action Priors for Accelerated Imitation Learning of Torque-Based Legged Locomotion Policies (IROS 2024). [arXiv:2310.05714](https://arxiv.org/abs/2310.05714)
+8. Hill, A. V., The heat of shortening and the dynamic constants of muscle (Proc. R. Soc. B, 1938). [doi:10.1098/rspb.1938.0050](https://royalsocietypublishing.org/doi/10.1098/rspb.1938.0050)
+9. Muscle fatigue literature — e.g., Liu, Brown & Yue, A Dynamical Model of Muscle Activation, Fatigue, and Recovery (Biophysical Journal, 2002). [PMC1302027](https://pmc.ncbi.nlm.nih.gov/articles/PMC1302027/)
+10. CPG-RL / learning-based hierarchical control literature — e.g., Bellegarda & Ijspeert, CPG-RL: Learning Central Pattern Generators for Quadruped Locomotion (RA-L, 2022). [arXiv:2211.00458](https://arxiv.org/abs/2211.00458)
 
 ---
 
