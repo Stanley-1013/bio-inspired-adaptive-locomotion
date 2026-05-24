@@ -28,6 +28,21 @@ term to improve behavior in boundary cases.
 > adaptive/robust control concepts below are used as a **language for analysis
 > and comparison**, not as claims of formal equivalence.
 
+## Repository
+
+```
+docs/   progress-report deck (pptx + pdf), design brief, SATA setup guide
+scripts/  setup + deck-build scripts, and the pptxgenjs deck generator
+.claude/  SessionStart hook (auto-runs scripts/setup.sh on web sessions)
+```
+
+- **Progress report:** `docs/progress-report-v1.pptx` / `.pdf`
+  (spec in `docs/progress-report-design-brief.md`).
+- **Reproduce SATA (needs a GPU box):** see `docs/setup-sata.md`.
+- **Rebuild the deck:** `bash scripts/setup.sh` then `bash scripts/build-deck.sh`.
+  (Deck build uses pptxgenjs + LibreOffice; SATA itself does **not** run in the
+  Claude Code web sandbox — no GPU / Isaac Gym.)
+
 ## 1. Motivation & Problem
 
 Position control struggles on unknown and unstructured terrains because of its
