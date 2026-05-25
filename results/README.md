@@ -16,7 +16,7 @@ following the reproduction steps inside each phase's README.
 | [phase1-reference](./phase1-reference/) | done (2026-05-26) | 3-seed SATA reference reproduction → mean reward 114 ± 6 |
 | phase2-ablation | planned | Toggle fatigue / growth / hill / terrain; one ablation per A6000 |
 | phase3-control-perspective | planned | Compare SATA's answers to adaptive-control questions |
-| phase4-residual-compensation | optional | `τ_total = τ_SATA + τ_comp` boundary-case exploration |
+| phase4-residual-compensation | optional | Body-height regulation residual under payload (motivated by SATA paper §VI-A) |
 
 ## Local-only navigation
 
