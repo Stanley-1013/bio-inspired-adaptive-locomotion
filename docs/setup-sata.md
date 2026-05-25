@@ -48,9 +48,13 @@ pip3 install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
 ```bash
 git clone https://github.com/marmotlab/SATA
 cd SATA
+git checkout 8fc422af3fec463a408779b1685c2453d0040be8  # commit used in this study
 pip install -e rsl_rl       # the repo's customized rsl_rl
 pip install -e legged_gym   # the repo's customized legged_gym
 ```
+
+> The commit hash above is what Phase 1 reproduction was run against. Newer
+> SATA commits may work but are untested by this project.
 
 Pinned extras required by SATA:
 

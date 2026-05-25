@@ -38,20 +38,39 @@ term in boundary cases.
 > classical adaptive/robust control vs. learning + bio-inspired mechanisms —
 > using the former's questions as a lens.
 
+## Status
+
+**Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds
+trained to convergence on 4× A6000; mean reward 114 ± 6 at iter 3000.
+Details and reproduction recipe in
+[`results/phase1-reference/`](./results/phase1-reference/).
+Phase 2 (ablation) and Phase 3 (control perspective) are next.
+
 ## Repository
 
 ```
-docs/   progress-report deck (pptx + pdf), design brief, SATA setup guide
-scripts/  setup + deck-build scripts, and the pptxgenjs deck generator
-.claude/  SessionStart hook (auto-runs scripts/setup.sh on web sessions)
+docs/      design brief, SATA setup, training-internals walkthrough, concepts primer
+results/   per-phase outcomes (text summaries; raw checkpoints live on NAS via symlink)
+scripts/   setup + sata-env helper + deck-build scripts + pptxgenjs deck generator
+.claude/   SessionStart hook (auto-runs scripts/setup.sh on web sessions)
+LICENSE    MIT
 ```
 
-- **Progress report:** `docs/20260525_progress_report_v1.pptx` / `.pdf`
-  (spec in `docs/progress-report-design-brief.md`).
-- **Reproduce SATA (needs a GPU box):** see `docs/setup-sata.md`.
-- **Rebuild the deck:** `bash scripts/setup.sh` then `bash scripts/build-deck.sh`.
-  (Deck build uses pptxgenjs + LibreOffice; SATA itself does **not** run in the
-  Claude Code web sandbox — no GPU / Isaac Gym.)
+Documentation:
+- **Project design brief:** [`docs/progress-report-design-brief.md`](./docs/progress-report-design-brief.md)
+- **Progress report deck:** [`docs/20260525_progress_report_v1.pdf`](./docs/20260525_progress_report_v1.pdf)
+  / `.pptx`
+- **Reproduce SATA (needs a GPU box):** [`docs/setup-sata.md`](./docs/setup-sata.md)
+- **What the training code actually does:** [`docs/training-internals.md`](./docs/training-internals.md)
+- **Primer for the underlying terms** (torque control, Hill model, PPO, etc.):
+  [`docs/concepts-primer.md`](./docs/concepts-primer.md)
+
+Results:
+- **Phase 1 — reference reproduction:** [`results/phase1-reference/`](./results/phase1-reference/)
+
+Rebuilding the slide deck (deck toolchain only; SATA training does not run in
+the Claude Code web sandbox — no GPU / Isaac Gym): `bash scripts/setup.sh`
+then `bash scripts/build-deck.sh`.
 
 ## 1. Motivation & Problem
 
