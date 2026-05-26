@@ -35,11 +35,13 @@ Key takeaways that shaped the plan:
 
 ## 1. Stack install
 
-Performed in order; failures recorded so future-me knows what to expect.
+Performed in order; failures recorded so future-me knows what to expect. The
+canonical sequence (without the false starts) is in
+[`docs/setup-sata.md`](../../docs/setup-sata.md).
 
 | Step | Command (abbreviated) | Notes |
 |---|---|---|
-| Miniconda | `bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3` | First attempt I aborted (interrupted); the half-finished `~/miniconda3` had to be `rm -rf`'d before a clean reinstall |
+| Miniconda | `bash Miniconda3-latest-Linux-x86_64.sh -b -p $HOME/miniconda3` | First attempt was interrupted; the half-finished `~/miniconda3` had to be `rm -rf`'d before a clean reinstall |
 | sata env | `conda create -n sata -c conda-forge --override-channels python=3.8 pip -y` | Used `conda-forge` to avoid the new Anaconda Terms-of-Service prompt on the `defaults` channel |
 | PyTorch | `pip install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 --extra-index-url https://download.pytorch.org/whl/cu116` | Pip auto-resolved to `2.0.1+cu117` (no cu116 wheel for torch 2.0.1 on PyPI's `cu116` index); works fine on driver 595 / A6000 |
 | Isaac Gym | `pip install -e ~/workspace/isaacgym/python` | User dropped `IsaacGym_Preview_4_Package.tar.gz` into `~/workspace/`; I moved + untarred in place |
@@ -70,7 +72,8 @@ EOF
 ```
 
 After this, every `conda activate sata` automatically brings `libpython3.8`
-into the loader path. Captured in [setup-sata.md Troubleshooting](../../docs/setup-sata.md#troubleshooting).
+into the loader path. Captured in
+[setup-sata.md Troubleshooting](../../docs/setup-sata.md#troubleshooting).
 
 ## 3. Sanity-check round 1 — false success
 
@@ -101,10 +104,10 @@ WANDB_MODE=disabled python scripts/train.py \
 ```
 
 Result: 50 iters in 75 s, 33k steps/s, final mean reward ~3.5 (very low —
-that's fine for 50 iters, the curriculum hasn't kicked in yet). The bio-inspired
-reward components (`rew_motor_fatigue`, `rew_forward`, …) all reported sensible
-values. gymtorch C++ extension compiled once and cached at
-`~/.cache/torch_extensions/py38_cu117/` — subsequent runs load instantly.
+that's fine for 50 iters; the curriculum hasn't kicked in yet). The
+bio-inspired reward components (`rew_motor_fatigue`, `rew_forward`, …) all
+reported sensible values. gymtorch's C++ extension compiled once and cached
+at `~/.cache/torch_extensions/py38_cu117/` — subsequent runs load instantly.
 
 I monitored this run with the Claude Monitor tool, watching the merged
 stdout/stderr stream for `Learning iteration|Traceback|Error|CUDA out of memory|Killed`
@@ -155,11 +158,11 @@ CUDA_VISIBLE_DEVICES=3 WANDB_MODE=disabled python scripts/train.py \
 ## 7. Monitoring during the 65-min run
 
 - `nvidia-smi --query-gpu=index,utilization.gpu,memory.used,temperature.gpu --format=csv,noheader`
-  every now and then to confirm GPUs warm (5.8 GB VRAM each, 38–41 % util,
-  75–85 °C — A6000s, well within thermal budget). GPU 1 stayed
-  at ~64 % / 87 °C — co-tenant kept working without contention.
+  periodically to confirm GPUs warm (5.8 GB VRAM each, 38–41 % util,
+  75–85 °C — A6000s, well within thermal budget). GPU 1 stayed at ~64 % /
+  87 °C — the co-tenant kept working without contention.
 - Tailed the three task output files for `Learning iteration|Traceback|Error`
-  patterns via the Monitor tool — no errors throughout.
+  via the Monitor tool — no errors throughout.
 
 ## 8. Completion
 
@@ -171,12 +174,12 @@ All three seeds finished cleanly (exit code 0 on the actual Python process):
 | 2 | 108 | 64.7 min | `May25_23-12-17_ref_s2` |
 | 3 | 112 | 64.0 min | `May25_23-12-22_ref_s3` |
 
-Reward variance is within normal seed-to-seed RL band (≈ ±5–10 % of mean).
+Reward variance is within the normal seed-to-seed RL band (≈ ±5–10 % of mean).
 
 ## 9. What I'd do differently
 
 - **Never wrap sanity-checks in `tail` / `head`** — see §3. Use Monitor with a
-  grep filter instead, or `python ... 2>&1 | tee log` so exit code propagates.
+  grep filter, or `python ... 2>&1 | tee log` so the exit code propagates.
 - **Pre-flight GPU check is non-negotiable on shared boxes.** A Kubernetes
   `nvidia.com/gpu: 4` allocation doesn't guarantee that nobody else is using
   the physical card you can see.
@@ -187,7 +190,6 @@ Reward variance is within normal seed-to-seed RL band (≈ ±5–10 % of mean).
 
 ## 10. References
 
-- The full env audit lives in this file's §0.
 - Install sequence and ordering rules: [`docs/setup-sata.md`](../../docs/setup-sata.md).
 - What the trained code does in detail: [`docs/training-internals.md`](../../docs/training-internals.md).
 - Concept primer for the RL / bio-inspired terms used above:

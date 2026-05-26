@@ -1,19 +1,18 @@
 # Bio-inspired Adaptive Locomotion via Torque-based Learning
 
-**A Case Study of SATA**
+**A Case Study of SATA** — a simulation-based study using adaptive and robust
+control questions as a lens.
 
-*A simulation-based study using adaptive and robust control questions as a lens.*
+This project reproduces **SATA** (Safe and Adaptive Torque-Based Locomotion
+Policies Inspired by Animal Learning; Li et al., RSS 2025; [official
+repo](https://github.com/marmotlab/SATA)) and investigates how its bio-inspired
+torque control produces adaptive locomotion. Educational and research use.
 
-This project reproduces and studies **SATA** (Safe and Adaptive Torque-Based
-Locomotion Policies Inspired by Animal Learning; Li et al., RSS 2025).
-
-Rather than proposing a new controller, this work investigates how bio-inspired
-torque control creates adaptive locomotion behaviors, and discusses these
-mechanisms through **adaptive and robust control questions**.
-
-Official implementation: https://github.com/marmotlab/SATA
-
-This repository is intended for educational and research purposes.
+**Current status (2026-05-26):** Phase 1 reproduces the SATA reference at
+**reward 114 ± 6** (3 seeds, iter 3000); Phase 2 ablations are complete.
+Start here: [`results/phase1-reference/`](./results/phase1-reference/) ·
+[`results/phase2-ablation/`](./results/phase2-ablation/) ·
+[`docs/setup-sata.md`](./docs/setup-sata.md).
 
 **Keywords:** Embodied AI · Adaptive Control · RL · Torque Control · Locomotion
 
@@ -21,34 +20,33 @@ This repository is intended for educational and research purposes.
 
 ## Overview
 
-This project takes SATA as its main subject. We first **reproduce** its
-torque-based locomotion pipeline in simulation, then use **ablation
-experiments** to observe how the biomechanical model, fatigue feedback, and
-growth mechanism shape adaptive behavior. Finally — and this is the framing that
-matters — we do **not** force SATA into classical control theory. Instead we let
-**adaptive / robust control supply the questions** (how to stay stable under
-unknown dynamics, reject disturbances, generalize) and observe **how SATA
-answers them differently** — with learning and biomechanics rather than analytic
-control laws. If time allows, we further test a simple **residual compensation**
-term in boundary cases.
+We take SATA as the main subject: **reproduce** its torque-based locomotion
+pipeline in simulation, then **ablate** the biomechanical model, fatigue
+feedback, and growth mechanism to see how each shapes adaptive behavior.
+Crucially, we do **not** force SATA into classical control theory. Instead we
+let **adaptive / robust control supply the questions** — stability under
+unknown dynamics, disturbance rejection, generalization — and observe **how
+SATA answers them differently**, with learning and biomechanics rather than
+analytic control laws. If time allows, we also test a simple **residual
+compensation** term in boundary cases.
 
 > Framing: the goal is **not** to claim SATA *is* adaptive control. SATA is a
 > learning-based policy with no Lyapunov-based update law or online parameter
-> estimation. We instead **compare two philosophies of handling adaptation** —
-> classical adaptive/robust control vs. learning + bio-inspired mechanisms —
-> using the former's questions as a lens.
+> estimation. We instead **compare two philosophies of adaptation** — classical
+> adaptive/robust control vs. learning + bio-inspired mechanisms — using the
+> former's questions as a lens.
 
 ## Status
 
-- **Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds
-  → mean reward **114 ± 6** at iter 3000.
+- **Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds →
+  mean reward **114 ± 6** at iter 3000.
   [`results/phase1-reference/`](./results/phase1-reference/)
 - **Phase 2 (Ablation) — done (2026-05-26).** 5 single-knob ablations × 3
-  seeds: Hill model is the only bio-inspired knob with clear positive
-  contribution to training reward (−17 % when ablated); fatigue and
-  activation low-pass actually slightly *raise* training reward when
-  removed. Caveat: training-reward only — Phase 4 will measure these on
-  out-of-distribution payload (SATA paper §VI-A).
+  seeds: Hill model is the only bio-inspired knob with a clear positive
+  contribution to training reward (−17 % when ablated); fatigue and the
+  activation low-pass slightly *raise* training reward when removed. Caveat:
+  training-reward only — Phase 4 will measure these on out-of-distribution
+  payload (SATA paper §VI-A).
   [`results/phase2-ablation/`](./results/phase2-ablation/)
 - **Phase 3 (Control perspective)** and **Phase 4 (Residual compensation)**
   are next.
@@ -65,8 +63,7 @@ LICENSE    MIT
 
 Documentation:
 - **Project design brief:** [`docs/progress-report-design-brief.md`](./docs/progress-report-design-brief.md)
-- **Progress report deck:** [`docs/20260525_progress_report_v1.pdf`](./docs/20260525_progress_report_v1.pdf)
-  / `.pptx`
+- **Progress report deck:** [`docs/20260525_progress_report_v1.pdf`](./docs/20260525_progress_report_v1.pdf) / [`.pptx`](./docs/20260525_progress_report_v1.pptx)
 - **Reproduce SATA (needs a GPU box):** [`docs/setup-sata.md`](./docs/setup-sata.md)
 - **What the training code actually does:** [`docs/training-internals.md`](./docs/training-internals.md)
 - **Primer for the underlying terms** (torque control, Hill model, PPO, etc.):
@@ -74,10 +71,11 @@ Documentation:
 
 Results:
 - **Phase 1 — reference reproduction:** [`results/phase1-reference/`](./results/phase1-reference/)
+- **Phase 2 — ablation:** [`results/phase2-ablation/`](./results/phase2-ablation/)
 
-Rebuilding the slide deck (deck toolchain only; SATA training does not run in
-the Claude Code web sandbox — no GPU / Isaac Gym): `bash scripts/setup.sh`
-then `bash scripts/build-deck.sh`.
+To rebuild the slide deck (deck toolchain only — SATA training requires a GPU
+and Isaac Gym, which the Claude Code web sandbox lacks):
+`bash scripts/setup.sh && bash scripts/build-deck.sh`.
 
 ## 1. Motivation & Problem
 
