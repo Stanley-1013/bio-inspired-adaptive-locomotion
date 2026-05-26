@@ -40,11 +40,18 @@ term in boundary cases.
 
 ## Status
 
-**Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds
-trained to convergence on 4× A6000; mean reward 114 ± 6 at iter 3000.
-Details and reproduction recipe in
-[`results/phase1-reference/`](./results/phase1-reference/).
-Phase 2 (ablation) and Phase 3 (control perspective) are next.
+- **Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds
+  → mean reward **114 ± 6** at iter 3000.
+  [`results/phase1-reference/`](./results/phase1-reference/)
+- **Phase 2 (Ablation) — done (2026-05-26).** 5 single-knob ablations × 3
+  seeds: Hill model is the only bio-inspired knob with clear positive
+  contribution to training reward (−17 % when ablated); fatigue and
+  activation low-pass actually slightly *raise* training reward when
+  removed. Caveat: training-reward only — Phase 4 will measure these on
+  out-of-distribution payload (SATA paper §VI-A).
+  [`results/phase2-ablation/`](./results/phase2-ablation/)
+- **Phase 3 (Control perspective)** and **Phase 4 (Residual compensation)**
+  are next.
 
 ## Repository
 

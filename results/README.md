@@ -14,7 +14,7 @@ following the reproduction steps inside each phase's README.
 | Phase | Status | Summary |
 |---|---|---|
 | [phase1-reference](./phase1-reference/) | done (2026-05-26) | 3-seed SATA reference reproduction → mean reward 114 ± 6 |
-| phase2-ablation | planned | Toggle fatigue / growth / hill / terrain; one ablation per A6000 |
+| [phase2-ablation](./phase2-ablation/) | done (2026-05-26) | 5 ablations × 3 seeds → Hill model is the only bio knob that clearly helps; activation & fatigue mildly hurt training reward |
 | phase3-control-perspective | planned | Compare SATA's answers to adaptive-control questions |
 | phase4-residual-compensation | optional | Body-height regulation residual under payload (motivated by SATA paper §VI-A) |
 

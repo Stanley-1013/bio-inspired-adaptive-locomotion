@@ -82,9 +82,102 @@ bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_
 Prints: launcher liveness, active train.py PIDs, GPU snapshot, per-run table
 (status / final reward / wall time), tail of launcher log.
 
-## 5. Results (TBD)
+## 5. Overnight outcome (2026-05-26 03:07 → 09:30)
 
-Will be filled in after the launcher reports DONE. Plan: lift the per-run
-final-reward table from `check_status.sh` output, compute mean ± std per
-ablation (over surviving seeds), and add a "what we learned" paragraph
-contrasting each ablation with Phase 1's 114 ± 6 baseline.
+Launcher ran 6 h 22 min unattended; final summary lifted from
+`phase2_launcher.log`:
+
+| Round | Batch | Contents | Wall |
+|---|---|---|---|
+| A | 1 | no_fatigue:1, no_hill:1, no_activation:1 | 03:07 → 04:37 (90 min — timeout) |
+| A | 2 | no_growth:1, hard_terrain:1 | 04:37 → 06:07 (90 min) |
+| — | triage | classified Round A | a few seconds |
+| B | 1 | no_hill:2, no_hill:3, no_activation:2 | 06:07 → 07:15 (68 min) |
+| B | 2 | no_activation:3, no_growth:2, no_growth:3 | 07:15 → 08:20 (66 min) |
+| B | 3 | hard_terrain:2, hard_terrain:3 | 08:20 → 09:29 (69 min) |
+
+Triage outcome: 4 ablations marked `OK` (no_hill, no_activation, no_growth,
+hard_terrain); 1 ablation marked `DID_NOT_FINISH` (no_fatigue) and its
+seeds 2,3 skipped.
+
+14 of 15 planned runs completed. Final-reward summary table is in
+[`README.md`](./README.md). All Round-A and Round-B batches exited with
+status 0 (no Tracebacks anywhere).
+
+## 6. Why `no_fatigue_s1` hit the 90-min timeout
+
+The other Round-A batch-1 runs finished in 64–65 min; `no_fatigue_s1` was
+still at iter 2497/3000 when `timeout 5400` killed it. My first hypothesis
+(that the `motor_fatigue=False` code path's `torch.zeros_like` was
+allocating a tensor every step) **was wrong** — the retry (§7) ran in
+63–64 min, identical to the other ablations. Looking back at the killed
+log's per-iteration times tells the real story:
+
+| iter | iter time (s) |
+|---:|---:|
+| 0–400 | 1.5–2.1 |
+| 600–800 | **2.94–3.42** ← spikes |
+| 1000 | 2.17 |
+| 1200–1400 | 1.6–2.4 |
+| 1600–1800 | **2.4–2.99** ← spikes |
+| 2000–2400 | 1.1–2.4 |
+| 2491–2497 | 1.1–1.4 ← back to normal |
+
+The slowdown was **environmental contention** (the other K8s tenant on this
+host, plus competition with our two batch-mates), not anything specific to
+the `no_fatigue` code path. The retry caught the box at a quieter moment.
+
+Lesson: per-run wall time on shared infrastructure is noisy enough that the
+safety timeout needs ≥ 50 % headroom over the median observation, not just
+20 %. Phase 1 had ~65-min runs alone, so 90 min looked like plenty of
+margin — but with 3 jobs sharing the box plus a noisy neighbour, ~2 × the
+median is needed.
+
+## 7. `no_fatigue` retry (2026-05-26 10:28)
+
+Re-ran no_fatigue × 3 seeds in parallel on GPUs 0/2/3, with the per-run
+timeout extended to 120 min (`timeout 7200`):
+
+```bash
+# preserve the killed log first
+mv ~/workspace/SATA/legged_gym/logs/phase2_launches/no_fatigue_s1.log \
+   ~/workspace/SATA/legged_gym/logs/phase2_launches/no_fatigue_s1_killed_at_90min.log
+
+# ad-hoc launcher (in /tmp; not committed since it is a one-shot retry)
+nohup setsid bash /tmp/relaunch_no_fatigue.sh \
+  > /tmp/relaunch_no_fatigue.log 2>&1 &
+disown
+```
+
+Expected wall time ~105–115 min per run (87 min / 2497 iter × 3000 iter +
+small parallel-contention overhead). ETA: ~12:30 CST.
+
+Retry results (all 3 seeds exited 0 cleanly):
+
+| seed | Final reward | Wall time |
+|---:|---:|---:|
+| 1 | 123.79 | 64.4 min |
+| 2 | 128.96 | 63.3 min |
+| 3 | 124.59 | 64.1 min |
+
+**Mean ± std: 125.8 ± 2.8** at iteration 3000 — _higher_ than the Phase 1
+reference (114 ± 6) by ~+12 (+10 %).  The seed-1 number is consistent with
+what the killed log was already showing at iter 2497, so the result is
+robust.
+
+## 8. Lessons for future phases
+
+- **Per-run safety timeout must allow for ablation-induced slowdown.** 90 min
+  was right for reference-speed runs but cuts off the slowest ablation. Use
+  ≥ 120 min from Phase 3 onward, or detect ablation-specific slowdown
+  beforehand by a 50-iter sanity timed on the actual ablation.
+- **Adaptive triage paid off**: by skipping no_fatigue's seeds 2,3 after
+  seed 1 didn't finish, the launcher avoided burning ~3 hours on what would
+  also have been clipped runs. Worst case savings if all 5 had failed:
+  ~3.5 hours.
+- **Preserve killed logs** rather than overwriting them — the killed log of
+  no_fatigue_s1 (`no_fatigue_s1_killed_at_90min.log`) is what let us
+  diagnose the slowdown afterwards.
+- **GPU 1 never touched** throughout the 6.5-hour run; the neighbour
+  tenant's allocation stayed at ~8 GB and was unaffected. Good lab
+  citizenship verified.

@@ -1,7 +1,9 @@
 # Phase 2 — Observation & Ablation
 
-**Status: in progress (launched 2026-05-26, overnight).** Results table will
-be filled in when the launcher completes.
+**Status: complete (2026-05-26).** 15 of 15 runs landed cleanly after a
+retry of `no_fatigue` × 3 seeds — the original run hit the 90-min safety
+timeout because of environmental contention on the shared box, not a
+code-path issue (see [`operations.md`](./operations.md) § 6).
 
 ## Goal
 
@@ -55,14 +57,78 @@ Run [`check_status.sh`](./check_status.sh) anytime to print:
 bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_status.sh
 ```
 
-## Results (TBD)
+## Results
 
-Will be filled in when the launcher reports DONE. Expected outputs:
-- Per-ablation final reward (mean ± std over surviving seeds)
-- Cross-ablation comparison table vs Phase 1 reference (114 ± 6)
-- Notes on which ablations broke and why (if any)
-- (Eventually) reward-curve plots — these will trigger creation of the
-  [`analysis/`](../../analysis/) directory at the top of the repo
+Final mean reward at iteration 3000 (`go2_torque` reference for context):
+
+| Ablation | seed 1 | seed 2 | seed 3 | **Mean ± std** | Δ vs reference (114 ± 6) |
+|---|---:|---:|---:|---:|---:|
+| **reference** (Phase 1) | 122 | 108 | 112 | **114 ± 6** | — |
+| `no_fatigue` | 123.8 | 129.0 | 124.6 | **125.8 ± 2.8** | **+12 (+10 %)** |
+| `no_activation` | 120.4 | 129.6 | 132.0 | **127.3 ± 5.0** | **+13 (+11 %)** |
+| `no_growth` | 107.2 | 109.7 | 100.8 | **105.9 ± 3.8** | −8 (−7 %) |
+| `no_hill` | 95.8 | 81.9 | 107.1 | **94.9 ± 10.4** | **−19 (−17 %)** |
+| `hard_terrain` | 39.0 | 39.4 | 46.4 | **41.6 ± 3.4** | **−72 (−63 %)** |
+
+### What we learned
+
+The four "bio-inspired" knobs do not have equal weight:
+
+- **Only the Hill force-velocity model has clear positive contribution to
+  the training reward** (−17 % when ablated). Without it the policy gets a
+  flat torque ceiling and visibly struggles — likely the loss of compliance
+  at high contact-velocity events.
+- **The growth curriculum is mildly helpful** (−7 % when ablated). Useful
+  for convergence stability, but the policy can still learn from a
+  fully-grown actuator and full command range; this is a "training
+  ergonomics" knob more than a behavioural one.
+- **Removing the activation-process low-pass actually *raises* mean reward**
+  by +11 %. The EMA on activation sign is supposed to model muscle
+  recruitment delay and prevent bang-bang torques, but a trained PPO policy
+  already emits smooth actions on its own, so the low-pass becomes a small
+  handicap that loses some peak responsiveness.
+- **Removing the motor-fatigue feedback also *raises* mean reward** by +10 %.
+  The reward-shaping cost of fatigue (`-0.05 × Σ|τ| · fatigue`) is small but
+  non-zero; with the cost removed, the policy is free to use its full torque
+  budget when useful.
+- **Hard-terrain reward drops 63 %** but the policy still converges to a
+  non-trivial reward — the reference recipe transfers to a 60 %-stairs
+  terrain mix without collapse, just with a much lower performance ceiling.
+  This is *generalisation across terrain difficulty*, not a behavioural
+  failure.
+
+#### Important interpretation caveat
+
+These numbers are **training-distribution scalar reward only**. They are
+**not evidence that fatigue and activation are useless**. In particular:
+
+- The reward signal does not measure *out-of-distribution robustness*
+  (payload, friction shift, terrain shift) — the SATA paper's own
+  §VI-A limitation on payload posture is exactly this kind of measurement
+  the scalar reward misses.
+- The reward signal does not measure *gait quality*, *energy efficiency*,
+  or *sim-to-real transferability*. The bio mechanisms may matter more on
+  those axes than on training-reward.
+- A higher training reward without these mechanisms may simply mean the
+  policy has exploited the reward more aggressively — which can correlate
+  with *worse* real-world or out-of-distribution behaviour.
+
+Phase 3 will treat these ablations as data points under the adaptive-control
+lens: *if* fatigue/activation are doing something useful, *where in the
+behaviour space should we look for the evidence?*  This framing is the bridge
+to Phase 4, which evaluates the ablation policies on the SATA paper's own
+stated weakness (payload posture, §VI-A) rather than on training reward.
+
+### Caveats (operational)
+
+- Runs were in parallel batches of 3 sharing the 64-core CPU and one NFS
+  volume. Wall times therefore show 10–20 % jitter from environmental
+  contention. The original `no_fatigue_s1` failure was an extreme case of
+  this jitter (see [`operations.md`](./operations.md) § 6); the retry came
+  in at the same throughput as the other ablations.
+- Reward-curve plots (per-ablation iteration → reward) are not yet
+  generated. When they are, the top-level [`analysis/`](../../analysis/)
+  directory will be created to host the script.
 
 ## Related
 
