@@ -75,6 +75,30 @@ have very different variance so a pooled-variance test would be wrong).
 | `no_growth` | 8 | **102.5 ± 7.3** | −1.4 | −1 % | −0.22 | 9.9 | 0.83 (n.s.) |
 | `hard_terrain` | 8 | **35.98 ± 6.1** | −67.9 | −65 % | −11.26 | 9.0 | **<0.001 ✱✱✱** |
 
+### Reward curves (all 48 runs)
+
+Per-condition mean across 8 seeds, ±1 std shaded band. The two surviving
+findings (`no_fatigue` and `no_activation` plateau above the reference) and
+the dissolved findings (`no_hill`, `no_growth` bands fully overlap the
+reference band) are both visible in one picture.
+
+![Reward curves — all conditions overlaid](./plots/reward_curves_overlay.png)
+
+Per-condition view, 8 individual seed curves + bold mean — useful for
+spotting outliers and instabilities:
+
+![Reward curves — per condition, individual seeds](./plots/reward_curves_per_condition.png)
+
+The reference subplot is the noisiest (one seed late-collapses, visible as
+the dip near iter 3000); `no_fatigue` is the tightest cluster; `no_hill`
+fans out the widest among the bio ablations — which is exactly why the
+−17 % effect from the 3-seed window didn't survive: that window sampled
+the lower edge of a wide distribution.
+
+Plots are regenerated from the raw tensorboard event files by
+[`../../analysis/plot_phase2_curves.py`](../../analysis/plot_phase2_curves.py)
+inside the `sata` conda env (needs `tbparse` + `matplotlib`).
+
 ### What changed when we went from 3 → 8 seeds
 
 The original 3-seed analysis claimed *"only Hill model has clear positive
