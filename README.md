@@ -8,9 +8,13 @@ Policies Inspired by Animal Learning; Li et al., RSS 2025; [official
 repo](https://github.com/marmotlab/SATA)) and investigates how its bio-inspired
 torque control produces adaptive locomotion. Educational and research use.
 
-**Current status (2026-05-26):** Phase 1 reproduces the SATA reference at
-**reward 114 ± 6** (3 seeds, iter 3000); Phase 2 ablations are complete.
-Start here: [`results/phase1-reference/`](./results/phase1-reference/) ·
+**Current status (2026-05-27):** Phase 1 reproduces the SATA reference and
+Phase 2 ran 5 single-knob ablations to 8 seeds each. With the larger
+sample, the only statistically significant findings are that **removing
+fatigue or activation lets the policy reach noticeably higher training
+reward** (+21 / +23 %, both p ≤ 0.006); Hill model and growth curriculum
+have **no detectable effect on training reward** (n.s.). Start here:
+[`results/phase1-reference/`](./results/phase1-reference/) ·
 [`results/phase2-ablation/`](./results/phase2-ablation/) ·
 [`docs/setup-sata.md`](./docs/setup-sata.md).
 
@@ -38,15 +42,21 @@ compensation** term in boundary cases.
 
 ## Status
 
-- **Phase 1 (Reproduce) — done (2026-05-26).** Three SATA reference seeds →
-  mean reward **114 ± 6** at iter 3000.
+- **Phase 1 (Reproduce) — done (2026-05-26).** 8 SATA reference seeds →
+  mean reward **104 ± 16** at iter 3000 (initial 3 seeds were 114 ± 6; the
+  expanded sample reveals genuinely larger seed-to-seed variance, including
+  one late-training PPO collapse).
   [`results/phase1-reference/`](./results/phase1-reference/)
-- **Phase 2 (Ablation) — done (2026-05-26).** 5 single-knob ablations × 3
-  seeds: Hill model is the only bio-inspired knob with a clear positive
-  contribution to training reward (−17 % when ablated); fatigue and the
-  activation low-pass slightly *raise* training reward when removed. Caveat:
-  training-reward only — Phase 4 will measure these on out-of-distribution
-  payload (SATA paper §VI-A).
+- **Phase 2 (Ablation) — done (2026-05-27).** 5 single-knob ablations × 8
+  seeds each. Only two effects survive Welch's t-test against the
+  reference: **`no_fatigue` +22 (p = 0.006)** and **`no_activation` +24
+  (p = 0.003)** — removing these bio constraints lets PPO reach higher
+  training reward. `no_hill` and `no_growth` are *not* significantly
+  different from reference (p ≈ 0.5, 0.8); the original 3-seed claim that
+  Hill model carried the bio contribution turned out to be sampling
+  artifact. `hard_terrain` drops to ~36 (p < 0.001).
+  Important caveat: training-reward only — Phase 4 will measure these on
+  out-of-distribution payload (SATA paper §VI-A).
   [`results/phase2-ablation/`](./results/phase2-ablation/)
 - **Phase 3 (Control perspective)** and **Phase 4 (Residual compensation)**
   are next.

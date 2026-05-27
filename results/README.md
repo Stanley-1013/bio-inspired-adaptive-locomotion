@@ -13,8 +13,8 @@ following the reproduction steps inside each phase's README.
 
 | Phase | Status | Summary |
 |---|---|---|
-| [phase1-reference](./phase1-reference/) | done (2026-05-26) | 3-seed SATA reference reproduction → mean reward 114 ± 6 |
-| [phase2-ablation](./phase2-ablation/) | done (2026-05-26) | 5 ablations × 3 seeds → Hill model is the only bio knob that clearly helps; activation & fatigue mildly hurt training reward |
+| [phase1-reference](./phase1-reference/) | done (2026-05-26) | SATA reference reproduction (initial 3 seeds 114 ± 6; extended to 8 seeds gives 104 ± 16 — see Phase 2) |
+| [phase2-ablation](./phase2-ablation/) | done (2026-05-27) | 5 ablations × 8 seeds. Only `no_fatigue` (+22) and `no_activation` (+24) significant; Hill model & growth curriculum have no detectable effect on training reward |
 | phase3-control-perspective | planned | Compare SATA's answers to adaptive-control questions |
 | phase4-residual-compensation | optional | Body-height regulation residual under payload (motivated by SATA paper §VI-A) |
 

@@ -165,19 +165,69 @@ reference (114 ± 6) by ~+12 (+10 %).  The seed-1 number is consistent with
 what the killed log was already showing at iter 2497, so the result is
 robust.
 
-## 8. Lessons for future phases
+## 8. Extension to 8 seeds (2026-05-26 21:23 → 2026-05-27 09:02)
 
-- **Per-run safety timeout must allow for ablation-induced slowdown.** 90 min
-  was right for reference-speed runs but cuts off the slowest ablation. Use
-  ≥ 120 min from Phase 3 onward, or detect ablation-specific slowdown
-  beforehand by a 50-iter sanity timed on the actual ablation.
-- **Adaptive triage paid off**: by skipping no_fatigue's seeds 2,3 after
-  seed 1 didn't finish, the launcher avoided burning ~3 hours on what would
-  also have been clipped runs. Worst case savings if all 5 had failed:
-  ~3.5 hours.
-- **Preserve killed logs** rather than overwriting them — the killed log of
-  no_fatigue_s1 (`no_fatigue_s1_killed_at_90min.log`) is what let us
-  diagnose the slowdown afterwards.
-- **GPU 1 never touched** throughout the 6.5-hour run; the neighbour
-  tenant's allocation stayed at ~8 GB and was unaffected. Good lab
-  citizenship verified.
+The 3-seed analysis produced borderline-significant t values (p ≈ 0.04–0.05)
+on several ablations — too thin to back the "Hill model is the only knob
+that helps" narrative without risking a reversal. We launched 5 more seeds
+(s4–s8) per condition — including the reference — so the final dataset is
+6 conditions × 8 seeds = 48 runs. See [`extend_to_8_seeds.sh`](./extend_to_8_seeds.sh).
+
+| Round | Batch | Wall time | Contents |
+|---|---|---|---|
+| s=4 | a | 66 min | reference, no_fatigue, no_hill |
+| s=4 | b | 69 min | no_activation, no_growth, hard_terrain |
+| s=5 | a | 71 min | (same trio a) |
+| s=5 | b | 70 min | (same trio b) |
+| s=6 | a | 68 min | a |
+| s=6 | b | 71 min | b |
+| s=7 | a | 71 min | a |
+| s=7 | b | 72 min | b |
+| s=8 | a | 70 min | a |
+| s=8 | b | 72 min | b |
+
+Total: 11 h 39 min wall; all 30 runs exited 0 cleanly within the 120-min
+safety timeout. Per-run wall settled at 63–68 min, very consistent.
+
+### What the 8-seed data showed
+
+- **Reference variance is much larger than the 3-seed estimate.** Std grew
+  from 6 to 16, mean dropped from 114 to 104. Seed 7 in particular trained
+  to ~100 then collapsed in the final 5 PPO iterations to 70 (a PPO
+  late-training instability — not a data error; iteration 2999 reached
+  cleanly, EXIT_CODE=0).
+- **`no_hill` -17 % → -5 % (n.s.)**: the seed-1/2/3 sample happened to draw
+  the lower tail of a high-variance distribution. With 8 seeds the
+  ablation is statistically indistinguishable from reference (p = 0.48).
+- **`no_growth` -7 % → -1 % (n.s.)**: similarly dissolved (p = 0.83).
+- **`no_fatigue` +10 % → +21 %, `no_activation` +11 % → +23 %**: stronger
+  evidence with more data (both now p ≤ 0.006).
+
+### Why we re-tested the reference too (and why this mattered)
+
+Adding seeds only to ablations would have kept the noisy 3-seed reference
+as the comparison; both terms in Welch's SE contain `s²_baseline / N_baseline`,
+so leaving the baseline at n=3 caps how much the SE can shrink. Bringing
+reference to n=8 was what let `no_fatigue` go from t=3.1 (3v3) to t=3.8
+(8v8), and what let us catch the seed-7 reference collapse that pushed
+the 3-seed estimate optimistic.
+
+## 9. Lessons for future phases
+
+- **n=3 is too few for a paper claim in this codebase.** Two of the
+  apparent 3-seed effects were sampling artifacts. n≥5 should be the
+  minimum from Phase 3 onward; n=8 was comfortable here and used 11.5 h
+  of wall on 3 GPUs.
+- **Bring the baseline up with the ablations.** Welch's SE has both
+  sample sizes in the denominator; leaving the baseline thin caps your
+  statistical power.
+- **Per-run safety timeout must allow for ablation-induced slowdown.**
+  90 min cut off `no_fatigue_s1` during environmental jitter. 120 min
+  proved safe across all 30 extension runs.
+- **Adaptive triage paid off** in the first overnight launcher: skipping
+  no_fatigue's seeds 2,3 after seed 1 didn't finish avoided ~3 h of GPU
+  on what would also have been clipped runs.
+- **Preserve killed logs** rather than overwriting them — the killed
+  `no_fatigue_s1_killed_at_90min.log` is what let us diagnose the slowdown.
+- **GPU 1 never touched** across the ~17 h total of all Phase 2 runs;
+  neighbour tenant unaffected.

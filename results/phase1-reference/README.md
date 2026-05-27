@@ -6,6 +6,13 @@ The published recipe reproduces reliably on our hardware — this is the
 "simulation running" milestone of the project plan. Operational details
 (install order, gotchas, monitoring) are in [`operations.md`](./operations.md).
 
+> Update (2026-05-27): the reference was later extended to 8 seeds during
+> Phase 2 to support fair ablation comparisons. The 8-seed reference mean
+> dropped to **104 ± 16**, dominated by one seed that suffered a late-PPO
+> instability in its last 5 iterations. The Phase 2 README uses the 8-seed
+> reference for all t-tests; the 3-seed numbers below remain the original
+> "simulation running" milestone.
+
 ## Goal
 
 Confirm that SATA's published `go2_torque` reference config trains a working
