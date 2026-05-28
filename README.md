@@ -8,14 +8,16 @@ Policies Inspired by Animal Learning; Li et al., RSS 2025; [official
 repo](https://github.com/marmotlab/SATA)) and investigates how its bio-inspired
 torque control produces adaptive locomotion. Educational and research use.
 
-**Current status (2026-05-27):** Phase 1 reproduces the SATA reference and
-Phase 2 ran 5 single-knob ablations to 8 seeds each. With the larger
-sample, the only statistically significant findings are that **removing
-fatigue or activation lets the policy reach noticeably higher training
-reward** (+21 / +23 %, both p ≤ 0.006); Hill model and growth curriculum
-have **no detectable effect on training reward** (n.s.). Start here:
+**Current status (2026-05-28):** Phase 1 reproduces the SATA reference;
+Phase 2 ran 5 single-knob ablations to 8 seeds each (on training reward);
+Phase 3 (out-of-distribution robustness + actuator-feasibility) is running.
+On *training reward* alone, removing the fatigue or activation constraint
+slightly *raises* reward — the expected sign of a constraint that exists to
+serve sim-to-real, not to score in a clean simulator. The mechanisms' real
+value is being measured under perturbation in Phase 3. Start here:
 [`results/phase1-reference/`](./results/phase1-reference/) ·
 [`results/phase2-ablation/`](./results/phase2-ablation/) ·
+[`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/) ·
 [`docs/setup-sata.md`](./docs/setup-sata.md).
 
 **Keywords:** Embodied AI · Adaptive Control · RL · Torque Control · Locomotion
@@ -48,18 +50,19 @@ compensation** term in boundary cases.
   one late-training PPO collapse).
   [`results/phase1-reference/`](./results/phase1-reference/)
 - **Phase 2 (Ablation) — done (2026-05-27).** 5 single-knob ablations × 8
-  seeds each. Only two effects survive Welch's t-test against the
-  reference: **`no_fatigue` +22 (p = 0.006)** and **`no_activation` +24
-  (p = 0.003)** — removing these bio constraints lets PPO reach higher
-  training reward. `no_hill` and `no_growth` are *not* significantly
-  different from reference (p ≈ 0.5, 0.8); the original 3-seed claim that
-  Hill model carried the bio contribution turned out to be sampling
-  artifact. `hard_terrain` drops to ~36 (p < 0.001).
-  Important caveat: training-reward only — Phase 4 will measure these on
-  out-of-distribution payload (SATA paper §VI-A).
-  [`results/phase2-ablation/`](./results/phase2-ablation/)
-- **Phase 3 (Control perspective)** and **Phase 4 (Residual compensation)**
-  are next.
+  seeds each, evaluated on *training-distribution reward*. Removing the
+  fatigue or activation constraint *raises* training reward (`no_fatigue`
+  +22, p = 0.006; `no_activation` +24, p = 0.003); `no_hill` and `no_growth`
+  are not significantly different from reference (p ≈ 0.5, 0.8). **This is
+  the expected sign of a working sim-to-real constraint** — a bound that
+  protects hardware costs a little reward in a clean simulator — not evidence
+  the mechanisms are useless. Their value is assessed out-of-distribution in
+  Phase 3, not here. [`results/phase2-ablation/`](./results/phase2-ablation/)
+- **Phase 3 (Bio-claims & OOD robustness) — in progress.** Evaluating all 48
+  policies under payload / push perturbations and measuring actuator-feasibility
+  metrics (peak torque, jerk, load distribution), to test what each constraint
+  actually buys. [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
+- **Phase 4 (Residual compensation)** is next.
 
 ## Repository
 

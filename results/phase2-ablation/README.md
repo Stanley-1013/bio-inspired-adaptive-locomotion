@@ -61,6 +61,19 @@ bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_
 
 ## Results (8 seeds per condition)
 
+> **Read this first — what these numbers are and are not.** The metric below is
+> *training-distribution scalar reward*. The SATA bio-inspired mechanisms are
+> designed primarily as **feasibility / safety constraints for sim-to-real
+> transfer** (bounded actuator torque, smooth activation, fatigue-based thermal
+> protection), not as devices to raise training reward. A constraint that
+> serves sim-to-real will, by construction, often *cost* a little training
+> reward in a clean simulator — so "ablating it raises reward" is the
+> *expected* sign of a working constraint, not evidence the mechanism is
+> useless. The decisive evaluation of these mechanisms is the out-of-distribution
+> / feasibility analysis in [`../phase3-bio-claims-and-robustness/`](../phase3-bio-claims-and-robustness/),
+> not this table. Treat the numbers here as *characterising the cost of each
+> constraint in-distribution*, and read them alongside that caveat.
+
 Final mean reward at iteration 3000, averaged across 8 random seeds per
 condition. Significance is Welch's two-sample t-test against the reference
 with Satterthwaite-approximated degrees of freedom (different conditions
@@ -91,9 +104,9 @@ spotting outliers and instabilities:
 
 The reference subplot is the noisiest (one seed late-collapses, visible as
 the dip near iter 3000); `no_fatigue` is the tightest cluster; `no_hill`
-fans out the widest among the bio ablations — which is exactly why the
-−17 % effect from the 3-seed window didn't survive: that window sampled
-the lower edge of a wide distribution.
+fans out the widest among the bio ablations — which is why the −17 % effect
+seen in the 3-seed window did not reach significance at n=8: those three
+seeds happened to fall on the lower edge of a wide distribution.
 
 Plots are regenerated from the raw tensorboard event files by
 [`../../analysis/plot_phase2_curves.py`](../../analysis/plot_phase2_curves.py)
@@ -101,9 +114,9 @@ inside the `sata` conda env (needs `tbparse` + `matplotlib`).
 
 ### What changed when we went from 3 → 8 seeds
 
-The original 3-seed analysis claimed *"only Hill model has clear positive
-contribution; no_growth mildly hurts"*. **Both of those claims dissolved**
-under the larger sample:
+Our own preliminary 3-seed read suggested *"only Hill model has a clear
+positive contribution; no_growth mildly hurts"*. Neither statement held up
+under the larger sample — a reminder of how thin n=3 is for RL:
 
 - `no_hill`'s apparent 17 % drop at n=3 became 5 % at n=8, and is statistically
   indistinguishable from reference noise (p = 0.48). The Hill ablation is
@@ -120,16 +133,20 @@ under the larger sample:
 
 Two effects strengthened with more data:
 
-- **Ablating the activation low-pass raises reward by +24** (p = 0.003).
-  The EMA on activation sign — meant to model muscle recruitment delay and
-  prevent bang-bang torques — turns out to be a constraint on what a trained
-  PPO policy can output. PPO already emits smooth actions on its own; the
-  low-pass costs peak responsiveness without buying anything the policy
-  needed.
-- **Ablating the motor-fatigue feedback raises reward by +22** (p = 0.006).
+- **Ablating the activation low-pass raises training reward by +24** (p = 0.003).
+  The EMA on activation sign models muscle recruitment delay and bounds how
+  fast torque can switch. In a clean simulator a PPO policy does not *need*
+  that bound to score well, so removing it lets the policy use a wider
+  action bandwidth and score higher. Whether that wider-bandwidth policy is
+  physically realisable / transferable is exactly what Phase 3 measures
+  (early nominal data already shows ablated policies hitting torque regimes
+  beyond the actuator spec).
+- **Ablating the motor-fatigue feedback raises training reward by +22** (p = 0.006).
   With the fatigue reward penalty (`-0.05 × Σ|τ| · fatigue`) gone and the
-  fatigue observation always zero, the policy is free to use full torque
-  budget whenever useful.
+  fatigue observation always zero, the policy is free to use its full torque
+  budget continuously — which scores well in-distribution but removes the
+  mechanism that, on real hardware, would protect actuators from sustained
+  high load.
 
 And one effect remains overwhelming (and unsurprising):
 

@@ -14,8 +14,8 @@ following the reproduction steps inside each phase's README.
 | Phase | Status | Summary |
 |---|---|---|
 | [phase1-reference](./phase1-reference/) | done (2026-05-26) | SATA reference reproduction (initial 3 seeds 114 ± 6; extended to 8 seeds gives 104 ± 16 — see Phase 2) |
-| [phase2-ablation](./phase2-ablation/) | done (2026-05-27) | 5 ablations × 8 seeds. Only `no_fatigue` (+22) and `no_activation` (+24) significant; Hill model & growth curriculum have no detectable effect on training reward |
-| phase3-control-perspective | planned | Compare SATA's answers to adaptive-control questions |
+| [phase2-ablation](./phase2-ablation/) | done (2026-05-27) | 5 ablations × 8 seeds on *training reward*. Removing fatigue/activation raises reward (expected sign of a sim-to-real constraint); hill/growth n.s. Real value assessed in Phase 3 |
+| [phase3-bio-claims-and-robustness](./phase3-bio-claims-and-robustness/) | in progress (2026-05-28) | All 48 policies under payload/push perturbations + actuator-feasibility metrics (peak torque, jerk, load distribution) |
 | phase4-residual-compensation | optional | Body-height regulation residual under payload (motivated by SATA paper §VI-A) |
 
 ## Local-only navigation
