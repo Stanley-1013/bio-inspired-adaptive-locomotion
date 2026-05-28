@@ -78,12 +78,22 @@ class Scenario:
     max_push_vel_ang: float = 0.0
 
 
-# v1 grid: nominal + payload axis. push / impulse axes added once payload pipeline is verified.
+# Scenario grid. Real Unitree Go2 payload spec: Air 7 kg / Pro 8 kg / EDU 12 kg;
+# body mass ~15 kg; peak joint torque 45 N·m (sim uses a conservative 23.5 N·m).
+# In-spec payloads (5, 8 kg) are the meaningful comparison points; 10/15 kg are
+# beyond rated capacity and are kept only to characterise *how* each policy
+# degrades (fall vs crouch), not as evidence of "robustness".
+# Push: the original push_x_3 / push_x_5 (every 2 s) proved too severe — they
+# crush every condition to ~20-35 reward, losing discriminative power. push_x_1p5
+# is a training-boundary-magnitude push at the training interval (4 s) — gentle
+# enough to discriminate.
 SCENARIOS: dict[str, Scenario] = {
     "nominal":       Scenario("nominal"),
     "payload_5kg":   Scenario("payload_5kg",   added_mass_range=(5.0, 5.0)),
-    "payload_10kg":  Scenario("payload_10kg",  added_mass_range=(10.0, 10.0)),
-    "payload_15kg":  Scenario("payload_15kg",  added_mass_range=(15.0, 15.0)),
+    "payload_8kg":   Scenario("payload_8kg",   added_mass_range=(8.0, 8.0)),    # Pro spec limit
+    "payload_10kg":  Scenario("payload_10kg",  added_mass_range=(10.0, 10.0)),  # beyond-spec
+    "payload_15kg":  Scenario("payload_15kg",  added_mass_range=(15.0, 15.0)),  # beyond-spec
+    "push_x_1p5":    Scenario("push_x_1p5",    push_robots=True, max_push_vel_xy=1.5, push_interval_s=4.0),
     "push_x_3":      Scenario("push_x_3",      push_robots=True, max_push_vel_xy=3.0, push_interval_s=2.0),
     "push_x_5":      Scenario("push_x_5",      push_robots=True, max_push_vel_xy=5.0, push_interval_s=2.0),
 }
@@ -98,7 +108,8 @@ def find_run_dir(prefix: str, seed: int) -> Path:
     return Path(matches[-1])
 
 
-def make_fake_args(task: str, load_run: str, num_envs: int = 64, seed: int = 0) -> argparse.Namespace:
+def make_fake_args(task: str, load_run: str, num_envs: int = 64, seed: int = 0,
+                   gpu: int = 0) -> argparse.Namespace:
     """Build the args object task_registry expects, without calling get_args()
     (which would parse our script's CLI). All sim-device defaults match
     Isaac Gym CPU/GPU pipeline conventions."""
@@ -111,16 +122,16 @@ def make_fake_args(task: str, load_run: str, num_envs: int = 64, seed: int = 0) 
         checkpoint=3000,
         headless=True,
         horovod=False,
-        rl_device="cuda:0",
+        rl_device=f"cuda:{gpu}",
         num_envs=num_envs,
         seed=seed,
         max_iterations=1,
         # sim params (computed in helpers.parse_sim_params)
         physics_engine=gymapi.SIM_PHYSX,
-        sim_device="cuda:0",
+        sim_device=f"cuda:{gpu}",
         sim_device_type="cuda",
-        compute_device_id=0,
-        graphics_device_id=0,
+        compute_device_id=gpu,
+        graphics_device_id=gpu,
         num_threads=0,
         subscenes=0,
         slices=0,
@@ -170,7 +181,7 @@ def apply_eval_overrides(cfg, scenario: Scenario, num_envs: int) -> None:
 # ---------- the actual eval loop --------------------------------------------
 
 def run_eval(condition: str, seed: int, scenario_name: str,
-             episodes_target: int = 64, num_envs: int = 64) -> dict:
+             episodes_target: int = 64, num_envs: int = 64, gpu: int = 0) -> dict:
     if condition not in CONDITION_INFO:
         raise ValueError(f"unknown condition '{condition}'")
     if scenario_name not in SCENARIOS:
@@ -183,7 +194,7 @@ def run_eval(condition: str, seed: int, scenario_name: str,
 
     print(f"  load_run={load_run}  task={task}  scenario={scenario_name}")
 
-    args = make_fake_args(task=task, load_run=load_run, num_envs=num_envs, seed=seed)
+    args = make_fake_args(task=task, load_run=load_run, num_envs=num_envs, seed=seed, gpu=gpu)
     env_cfg, train_cfg = task_registry.get_cfgs(name=task)
     apply_eval_overrides(env_cfg, scenario, num_envs=num_envs)
 
@@ -373,6 +384,7 @@ def main():
                     help="single-cell mode: which scenario")
     ap.add_argument("--episodes", type=int, default=64)
     ap.add_argument("--num-envs", type=int, default=64)
+    ap.add_argument("--gpu", type=int, default=0, help="GPU index for sim + policy")
     ap.add_argument("--out-csv", type=Path,
                     help="single-cell mode: append this cell's result row to this CSV")
     ap.add_argument("--batch-csv", type=Path,
@@ -393,7 +405,7 @@ def main():
         if not (args.condition and args.seed is not None and args.scenario):
             ap.error("single-cell mode needs --condition --seed --scenario")
         agg = run_eval(args.condition, args.seed, args.scenario,
-                       episodes_target=args.episodes, num_envs=args.num_envs)
+                       episodes_target=args.episodes, num_envs=args.num_envs, gpu=args.gpu)
         print()
         print("=== aggregate ===")
         for k, v in agg.items():
@@ -431,6 +443,7 @@ def main():
             sys.executable, os.path.abspath(__file__),
             "--condition", cond, "--seed", str(seed), "--scenario", scen,
             "--episodes", str(args.episodes), "--num-envs", str(args.num_envs),
+            "--gpu", str(args.gpu),
             "--out-csv", str(csv_path),
         ]
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=900)

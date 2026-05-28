@@ -58,10 +58,15 @@ compensation** term in boundary cases.
   protects hardware costs a little reward in a clean simulator — not evidence
   the mechanisms are useless. Their value is assessed out-of-distribution in
   Phase 3, not here. [`results/phase2-ablation/`](./results/phase2-ablation/)
-- **Phase 3 (Bio-claims & OOD robustness) — in progress.** Evaluating all 48
-  policies under payload / push perturbations and measuring actuator-feasibility
-  metrics (peak torque, jerk, load distribution), to test what each constraint
-  actually buys. [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
+- **Phase 3 (Bio-claims & OOD robustness) — done (2026-05-29).** All 48
+  policies evaluated under payload/push perturbations + actuator-feasibility
+  metrics (384 cells). The ablations that won Phase 2 reward turn out to leave
+  the hardware-realisable envelope: `no_activation` peaks at **42.5 N·m**
+  (≈ the real Go2's 45 N·m limit), `no_fatigue` uses **2.5× energy / 35× jerk**
+  (all p<0.001). The fatigue/activation constraints cost training reward but
+  keep the policy hardware-realisable — supporting the "feasibility envelope"
+  reading over "over-engineering". Caveat: simulation only, no thermal model.
+  [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
 - **Phase 4 (Residual compensation)** is next.
 
 ## Repository
