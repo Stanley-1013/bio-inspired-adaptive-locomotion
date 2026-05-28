@@ -307,8 +307,11 @@ def run_eval(condition: str, seed: int, scenario_name: str,
             max_steps = int(env.max_episode_length)
             early = (ep_steps[done_idx] < max_steps - 1).long()
             results["early_terminated"].extend(early.cpu().tolist())
-            # survival = made it to max episode length (matches SATA Table IV
-            # "success" convention: episode did not terminate early via head/body contact).
+            # NOTE: this `survived` flag is miscalibrated and uninformative —
+            # max_steps = int(env.max_episode_length) ≈ 4000 (nominal-dt cap) is
+            # never reached by the variable-control-rate rollout (a no-fall episode
+            # completes at ~3578 steps), so `survived` ≈ 0 everywhere. Read falls
+            # off `ep_length` relatively instead. Kept only for CSV-schema stability.
             survived = (ep_steps[done_idx] >= max_steps - 1).long()
             results["survived"].extend(survived.cpu().tolist())
             completed += int(done_idx.numel())

@@ -52,7 +52,7 @@ Welch's t-test of each ablation against the reference (8 v 8):
 | reference | 22.5 ± 0.3 | 0.68 ± 0.05 | 782 ± 94 |
 | `no_fatigue` | 30.1 ± 1.4 ✱✱✱ | **1.69 ± 0.08** ✱✱✱ (2.5×) | **26 998 ± 2949** ✱✱✱ (35×) |
 | `no_hill` | 19.5 ± 0.2 ✱✱✱ (lower) | 0.65 ± 0.26 (n.s.) | 733 ± 147 (n.s.) |
-| `no_activation` | **42.5 ± 4.4** ✱✱✱ (≈ Go2 45) | 0.58 ± 0.12 ✱ (lower) | 351 ± 24 ✱✱✱ (lower) |
+| `no_activation` | **42.5 ± 4.4** ✱✱✱ (≈ Go2 45) | 0.58 ± 0.12 (n.s.) | 351 ± 24 ✱✱✱ (lower) |
 | `no_growth` | 22.7 ± 0.8 (n.s.) | 0.69 ± 0.09 (n.s.) | 821 ± 115 (n.s.) |
 
 (✱ p<0.05, ✱✱ p<0.01, ✱✱✱ p<0.001. All "✱✱✱" comparisons have t > 12.)
@@ -65,11 +65,11 @@ statistics make precise:
 
 - **`no_activation` breaches on peak torque only.** It peaks at 42.5 ± 4.4 N·m
   (p<0.001) — at the real Go2's 45 N·m limit, ~1.8× the sim's own 23.5 N·m
-  clip. Its energy is actually slightly *lower* than reference (0.58, p=0.025)
-  and its action-jerk is *lower* (351 vs 782, p<0.001). So the activation
-  low-pass was not making the policy smoother (PPO is already smooth); it was
-  **bounding peak torque**. Removing it lets PPO command near-saturation torque
-  a real actuator could not hold.
+  clip. Its energy is statistically indistinguishable from reference
+  (0.58 vs 0.68; two-sided Welch p≈0.05, n.s.) and its action-jerk is *lower*
+  (351 vs 782, p<0.001). So the activation low-pass was not making the policy
+  smoother (PPO is already smooth); it was **bounding peak torque**. Removing
+  it lets PPO command near-saturation torque a real actuator could not hold.
 - **`no_fatigue` breaches on sustained power and smoothness.** 2.5× the
   mechanical energy (p<0.001) and 35× the action-jerk (p<0.001), with peak
   torque also up (30.1, p<0.001). Without the fatigue penalty the policy
@@ -92,8 +92,16 @@ Pro 8 kg); red = beyond rated capacity. `no_fatigue` beats reference at every
 payload, all p<0.001 (Welch): Δ +40 (5 kg), +94 (8 kg), +113 (10 kg),
 +126 (15 kg).
 
-The discriminating signal is **episode survival** (max length = 3578 steps =
-full 20 s):
+The discriminating signal is **how long the episode runs before the robot
+falls** (episode length, in policy steps). A rollout completed without falling
+runs ~3500–3580 steps at the eval control rate (nominal reference 3485 ± 72,
+nominal no_fatigue 3551 ± 15 — the robot is walking the whole time, confirmed
+by the high nominal reward). A shorter, high-variance length means episodes
+are terminating early = the robot is falling. (Note: the harness's `survived`/
+`early_terminated` flags were computed against a nominal-dt cap of 4000 steps
+that the variable-rate eval rollout never reaches, so they are uninformative;
+we read falls off episode length directly, which is valid as a *relative*
+measure.)
 
 | payload | reference ep-length | no_fatigue ep-length |
 |---|---:|---:|
@@ -103,17 +111,19 @@ full 20 s):
 | 15 kg | **2530 ± 845** (falls) | 3578 ± 0 |
 
 - **In-spec (5–8 kg) reproduces SATA §VI-A.** The reference sags from
-  height 0.32 → 0.26 (5 kg) → 0.20 (8 kg); at 8 kg it begins to **fall**
-  (ep-length 2994 ± 471, large variance = some episodes terminate early) and
-  reward drops 280 → 214 → 60. The paper's stated limitation — "cannot
-  maintain body height with a medium payload" — reproduces cleanly at the
-  rated load.
-- **`no_fatigue` never falls (3578 ± 0 at every payload) and genuinely
-  carries better in-sim, not merely "survives".** At 8 kg it tracks the
-  forward command *better* than reference (velocity error 0.39 vs 0.47) while
-  crouching lower (height 0.12 vs 0.20). Only at the far-beyond-spec 15 kg
-  (≈ body mass) does it degrade to survival-without-progress (velocity error
-  0.93 — essentially stationary but upright).
+  height 0.32 → 0.26 (5 kg) → 0.20 (8 kg); at 8 kg its episode length drops to
+  2994 ± 471 (large variance = some rollouts **fall** early) and reward drops
+  280 → 214 → 60. The paper's stated limitation — "cannot maintain body height
+  with a medium payload" — reproduces cleanly at the rated load.
+- **Within the payload scenarios `no_fatigue` does not fall** (episode length
+  holds at its nominal ~3578 at every payload) and genuinely carries better
+  in-sim, not merely "survives". At 8 kg it tracks the forward command *better*
+  than reference (velocity error 0.39 vs 0.47) while crouching lower (height
+  0.12 vs 0.20). Only at the far-beyond-spec 15 kg (≈ body mass) does it
+  degrade to survival-without-progress (velocity error 0.93 — essentially
+  stationary but upright). (This "does not fall" is specific to the payload
+  axis; under hard lateral push `no_fatigue` falls like everything else —
+  Result 3.)
 - **The catch — and the link back to Result 1.** `no_fatigue`'s payload
   advantage comes from sustaining the high torque needed to hold a heavy load
   up; that is the *same* sustained-high-power behaviour that shows up as 2.5×

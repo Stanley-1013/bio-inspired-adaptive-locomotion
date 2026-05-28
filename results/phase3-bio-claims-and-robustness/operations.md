@@ -84,6 +84,21 @@ distribution from `torque_peak_std_acrossdofs` / `energy_std_acrossdofs`, which
 are defined for every condition. (Recorded here so the zero column in the CSV
 is not mistaken for a finding.)
 
+Two more metric caveats found in an independent rigor review of the analysis:
+
+- **The `survived` / `early_terminated` flags are uninformative — do not use
+  them.** They were defined against `int(env.max_episode_length)` ≈ 4000 steps
+  (the nominal-dt cap), but the variable-control-rate eval rollout completes a
+  no-fall episode at ~3500–3580 steps, so `survived` is ~0 and
+  `early_terminated` ~1 in *every* cell, including healthy nominal walking.
+  Falls are read off **episode length relatively** instead (a no-fall rollout
+  ≈ 3578 steps; a shorter, high-variance length = falling). Valid as a relative
+  measure; the absolute "20 s = N steps" cap is not asserted.
+- **`no_activation` nominal energy is NOT significantly different** from
+  reference under the declared two-sided Welch test (p≈0.05). An earlier draft
+  marked it significant using a one-sided p; corrected to n.s. The headline
+  `no_activation` finding (peak torque 42.5 N·m) is unaffected.
+
 ## Analysis
 
 Aggregation + Welch t-tests (8 v 8, unequal variance, Satterthwaite df) and
