@@ -5,6 +5,9 @@ Phase 1/2) evaluated under 8 controlled scenarios — 384 evaluation cells,
 64 episodes each. Raw data: [`raw_metrics.csv`](./raw_metrics.csv) (6 scenarios)
 + [`raw_metrics_suppl.csv`](./raw_metrics_suppl.csv) (8 kg payload + gentle push).
 
+**Simulation clips:** [`videos/`](./videos/) — reference walking, the §VI-A
+payload sag, and the no_fatigue contrast, as inline GIFs.
+
 ## Why this phase exists
 
 Phase 2 found that removing the fatigue or activation constraint *raises*

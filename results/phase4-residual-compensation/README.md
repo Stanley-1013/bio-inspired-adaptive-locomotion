@@ -3,6 +3,9 @@
 **Status: done (2026-05-29).** A preliminary boundary-case probe, as scoped in
 the project plan ("explore a lightweight residual term, if time allows").
 
+**Simulation clip:** [`videos/`](./videos/) — the residual assisting the frozen
+policy under payload, as an inline GIF.
+
 ## Question
 
 Phase 3 showed the reference policy fails the SATA §VI-A payload limitation —
