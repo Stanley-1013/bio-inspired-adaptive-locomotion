@@ -60,6 +60,9 @@ CONDITION_INFO = {
     "no_activation": ("no_activation","go2_torque_no_activation"),
     "no_growth":     ("no_growth",    "go2_torque_no_growth"),
     "hard_terrain":  ("hard_terrain", "go2_torque_hard_terrain"),
+    # Phase 4: a frozen reference (ref_sN) policy run inside the residual env
+    # (tau_total = tau_SATA + classical height-PD on the calf joints).
+    "ref_residual":  ("ref",          "go2_torque_residual"),
 }
 
 
@@ -181,7 +184,8 @@ def apply_eval_overrides(cfg, scenario: Scenario, num_envs: int) -> None:
 # ---------- the actual eval loop --------------------------------------------
 
 def run_eval(condition: str, seed: int, scenario_name: str,
-             episodes_target: int = 64, num_envs: int = 64, gpu: int = 0) -> dict:
+             episodes_target: int = 64, num_envs: int = 64, gpu: int = 0,
+             residual_overrides: dict | None = None) -> dict:
     if condition not in CONDITION_INFO:
         raise ValueError(f"unknown condition '{condition}'")
     if scenario_name not in SCENARIOS:
@@ -197,6 +201,12 @@ def run_eval(condition: str, seed: int, scenario_name: str,
     args = make_fake_args(task=task, load_run=load_run, num_envs=num_envs, seed=seed, gpu=gpu)
     env_cfg, train_cfg = task_registry.get_cfgs(name=task)
     apply_eval_overrides(env_cfg, scenario, num_envs=num_envs)
+
+    # Phase 4: optional residual-controller overrides (only the residual env has cfg.residual)
+    if residual_overrides and hasattr(env_cfg, "residual"):
+        for k, v in residual_overrides.items():
+            setattr(env_cfg.residual, k, v)
+        print(f"  residual overrides: {residual_overrides}")
 
     train_cfg.runner.resume = True
     train_cfg.runner.load_run = load_run
@@ -388,6 +398,12 @@ def main():
     ap.add_argument("--episodes", type=int, default=64)
     ap.add_argument("--num-envs", type=int, default=64)
     ap.add_argument("--gpu", type=int, default=0, help="GPU index for sim + policy")
+    # Phase 4 residual-controller overrides (only affect the ref_residual condition)
+    ap.add_argument("--residual-sign", type=float, default=None)
+    ap.add_argument("--residual-kp", type=float, default=None)
+    ap.add_argument("--residual-kd", type=float, default=None)
+    ap.add_argument("--residual-tau-cap", type=float, default=None)
+    ap.add_argument("--residual-target-h", type=float, default=None)
     ap.add_argument("--out-csv", type=Path,
                     help="single-cell mode: append this cell's result row to this CSV")
     ap.add_argument("--batch-csv", type=Path,
@@ -401,6 +417,13 @@ def main():
                     help="batch mode: restrict to a subset of scenarios")
     args = ap.parse_args()
 
+    # Collect any residual-controller overrides into a dict (None = use cfg default)
+    _ro = {
+        "sign": args.residual_sign, "kp": args.residual_kp, "kd": args.residual_kd,
+        "tau_cap": args.residual_tau_cap, "target_height": args.residual_target_h,
+    }
+    residual_overrides = {k: v for k, v in _ro.items() if v is not None} or None
+
     # Single-cell mode (also used as the subprocess unit of batch mode).
     # Isaac Gym only allows ONE sim per process, so batch mode below spawns a
     # fresh subprocess per cell rather than looping in-process.
@@ -408,7 +431,8 @@ def main():
         if not (args.condition and args.seed is not None and args.scenario):
             ap.error("single-cell mode needs --condition --seed --scenario")
         agg = run_eval(args.condition, args.seed, args.scenario,
-                       episodes_target=args.episodes, num_envs=args.num_envs, gpu=args.gpu)
+                       episodes_target=args.episodes, num_envs=args.num_envs, gpu=args.gpu,
+                       residual_overrides=residual_overrides)
         print()
         print("=== aggregate ===")
         for k, v in agg.items():
@@ -449,6 +473,13 @@ def main():
             "--gpu", str(args.gpu),
             "--out-csv", str(csv_path),
         ]
+        for flag, val in [("--residual-sign", args.residual_sign),
+                          ("--residual-kp", args.residual_kp),
+                          ("--residual-kd", args.residual_kd),
+                          ("--residual-tau-cap", args.residual_tau_cap),
+                          ("--residual-target-h", args.residual_target_h)]:
+            if val is not None:
+                cmd += [flag, str(val)]
         proc = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
         if proc.returncode != 0:
             print(f"  !! subprocess exit {proc.returncode}; tail of stderr:")

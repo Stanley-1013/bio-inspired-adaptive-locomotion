@@ -16,7 +16,7 @@ following the reproduction steps inside each phase's README.
 | [phase1-reference](./phase1-reference/) | done (2026-05-26) | SATA reference reproduction (initial 3 seeds 114 ± 6; extended to 8 seeds gives 104 ± 16 — see Phase 2) |
 | [phase2-ablation](./phase2-ablation/) | done (2026-05-27) | 5 ablations × 8 seeds on *training reward*. Removing fatigue/activation raises reward (expected sign of a sim-to-real constraint); hill/growth n.s. Real value assessed in Phase 3 |
 | [phase3-bio-claims-and-robustness](./phase3-bio-claims-and-robustness/) | done (2026-05-29) | 384 cells. The ablations that won Phase 2 reward breach the hardware envelope (no_activation peak 42.5 N·m ≈ Go2 limit; no_fatigue 2.5× energy, 35× jerk) → bio knobs are feasibility constraints, not reward devices |
-| phase4-residual-compensation | optional | Body-height regulation residual under payload (motivated by SATA paper §VI-A) |
+| [phase4-residual-compensation](./phase4-residual-compensation/) | done (2026-05-29) | Simple stance-gated height-PD residual on the frozen policy: small in-envelope payload recovery (8 kg +37 %, p=0.045), harmless at nominal, but capped because the frozen policy treats it as a disturbance |
 
 ## Local-only navigation
 

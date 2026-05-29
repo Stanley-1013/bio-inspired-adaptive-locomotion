@@ -64,10 +64,19 @@ compensation** term in boundary cases.
   the hardware-realisable envelope: `no_activation` peaks at **42.5 N·m**
   (≈ the real Go2's 45 N·m limit), `no_fatigue` uses **2.5× energy / 35× jerk**
   (all p<0.001). The fatigue/activation constraints cost training reward but
-  keep the policy hardware-realisable — supporting the "feasibility envelope"
-  reading over "over-engineering". Caveat: simulation only, no thermal model.
+  keep the policy hardware-realisable. Caveat: simulation only, no thermal model.
   [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
-- **Phase 4 (Residual compensation)** is next.
+- **Phase 4 (Residual compensation) — done (2026-05-29).** A simple stance-gated
+  classical height-PD residual `τ_total = τ_SATA + τ_comp`, bolted onto the
+  frozen reference policy, gives a small, borderline-significant payload-reward
+  recovery (8 kg: +37 %, p=0.045) **within the actuator envelope and harmless at
+  nominal** — but only ~1/4 of the way to the no_fatigue ablation, because the
+  frozen policy treats the residual as a disturbance. Motivates co-trained
+  RL+adaptation (RL2AC). [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
+- **Synthesis — the control-theoretic reading** (delivers this project's
+  original framing): [`docs/control-perspective.md`](./docs/control-perspective.md)
+  maps every finding onto the questions adaptive/robust control asks, and
+  corrects two tempting-but-wrong analogies using the data.
 
 ## Repository
 
@@ -86,10 +95,14 @@ Documentation:
 - **What the training code actually does:** [`docs/training-internals.md`](./docs/training-internals.md)
 - **Primer for the underlying terms** (torque control, Hill model, PPO, etc.):
   [`docs/concepts-primer.md`](./docs/concepts-primer.md)
+- **Control-theoretic synthesis (the framing capstone):**
+  [`docs/control-perspective.md`](./docs/control-perspective.md)
 
 Results:
 - **Phase 1 — reference reproduction:** [`results/phase1-reference/`](./results/phase1-reference/)
 - **Phase 2 — ablation:** [`results/phase2-ablation/`](./results/phase2-ablation/)
+- **Phase 3 — bio-claims & OOD robustness:** [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
+- **Phase 4 — residual compensation:** [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
 
 To rebuild the slide deck (deck toolchain only — SATA training requires a GPU
 and Isaac Gym, which the Claude Code web sandbox lacks):
@@ -183,6 +196,12 @@ a lens for discussion, not equivalence:
 
 *SATA has no Lyapunov-based update law or online parameter estimation — these
 are framing lenses, not formal equivalences.*
+
+> **These tables are now backed by data and partly corrected** in
+> [`docs/control-perspective.md`](./docs/control-perspective.md): the Phase 2–4
+> experiments confirm the Hill/activation ↔ learned-in actuator-feasibility
+> reading, but **down-grade** the "fatigue ↔ disturbance compensation" and
+> "growth ↔ gain scheduling" analogies above — both fail against the evidence.
 
 ## 6. Expected Outcomes
 
