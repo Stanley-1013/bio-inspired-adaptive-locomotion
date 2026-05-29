@@ -5,8 +5,12 @@ Phase 1/2) evaluated under 8 controlled scenarios — 384 evaluation cells,
 64 episodes each. Raw data: [`raw_metrics.csv`](./raw_metrics.csv) (6 scenarios)
 + [`raw_metrics_suppl.csv`](./raw_metrics_suppl.csv) (8 kg payload + gentle push).
 
-**Simulation clips:** [`videos/`](./videos/) — reference walking, the §VI-A
-payload sag, and the no_fatigue contrast, as inline GIFs.
+**Simulation clips** (full gallery + narration in [`videos/`](./videos/)):
+
+| reference, 10 kg payload | no_fatigue, 10 kg payload |
+|---|---|
+| ![ref](./videos/02_reference_payload10.gif) | ![nf](./videos/03_no_fatigue_payload10.gif) |
+| Goes down — reproduces SATA §VI-A. | Stays up by hardware-infeasible thrashing. |
 
 ## Why this phase exists
 

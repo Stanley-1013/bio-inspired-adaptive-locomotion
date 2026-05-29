@@ -8,17 +8,28 @@ Policies Inspired by Animal Learning; Li et al., RSS 2025; [official
 repo](https://github.com/marmotlab/SATA)) and investigates how its bio-inspired
 torque control produces adaptive locomotion. Educational and research use.
 
-**Current status (2026-05-28):** Phase 1 reproduces the SATA reference;
-Phase 2 ran 5 single-knob ablations to 8 seeds each (on training reward);
-Phase 3 (out-of-distribution robustness + actuator-feasibility) is running.
-On *training reward* alone, removing the fatigue or activation constraint
-slightly *raises* reward — the expected sign of a constraint that exists to
-serve sim-to-real, not to score in a clean simulator. The mechanisms' real
-value is being measured under perturbation in Phase 3. Start here:
-[`results/phase1-reference/`](./results/phase1-reference/) ·
-[`results/phase2-ablation/`](./results/phase2-ablation/) ·
-[`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/) ·
-[`docs/setup-sata.md`](./docs/setup-sata.md).
+**Current status (2026-05-29):** Phases 1–4 complete. We reproduce the SATA
+reference, ablate each bio-inspired mechanism (8 seeds), evaluate all 48
+policies under perturbation, and probe a classical residual — then read the
+whole thing through adaptive/robust control's questions. Headline: on *training
+reward* alone, removing the fatigue or activation constraint slightly *raises*
+reward, but Phase 3 shows those ablations only "win" by leaving the
+hardware-realisable torque envelope (`no_activation` peaks at 42.5 N·m vs the
+real Go2's 45 N·m limit). The bio mechanisms are **sim-to-real feasibility
+constraints, not reward devices**. Start here:
+[`docs/sata-overview.md`](./docs/sata-overview.md) (what SATA contributes) ·
+[`docs/control-perspective.md`](./docs/control-perspective.md) (the synthesis) ·
+[results phases 1–4](./results/) · [`docs/setup-sata.md`](./docs/setup-sata.md).
+
+### The core finding in one comparison (10 kg payload, beyond rated capacity)
+
+| reference (full SATA) — reproduces the paper's §VI-A payload limit | `no_fatigue` ablation — stays up, but by hardware-infeasible thrashing |
+|---|---|
+| ![reference under payload](./results/phase3-bio-claims-and-robustness/videos/02_reference_payload10.gif) | ![no_fatigue under payload](./results/phase3-bio-claims-and-robustness/videos/03_no_fatigue_payload10.gif) |
+| The fatigue constraint refuses the sustained torque needed for an over-rated load → the robot goes down (the paper's own stated limitation). | Removing fatigue keeps it upright under the same load — but at 2.5× energy / 35× action-jerk, behaviour a real motor could not hold. |
+
+More clips: [Phase 3 gallery](./results/phase3-bio-claims-and-robustness/videos/) ·
+[Phase 4 gallery](./results/phase4-residual-compensation/videos/).
 
 **Keywords:** Embodied AI · Adaptive Control · RL · Torque Control · Locomotion
 
