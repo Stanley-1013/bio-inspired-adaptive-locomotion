@@ -40,8 +40,12 @@ event.
 |---|---|
 | ![push](./results/phase3-bio-claims-and-robustness/videos/ev_push.gif) | ![leg pull](./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif) |
 | Staggers, stays up, recovers. | Resists a persistent pull on one leg (red) and keeps balance — an *external* force, not motor failure. |
+| ![vertical](./results/phase3-bio-claims-and-robustness/videos/ev_vertical.gif) | ![stairs](./results/phase3-bio-claims-and-robustness/videos/ev_stairs.gif) |
+| **Vertical impact** — absorbed, then recovers. | **Stairs** (hard_terrain policy, trained on stepped terrain). |
 
-More: [vertical impact, stairs, and the full gallery](./results/phase3-bio-claims-and-robustness/videos/).
+Disturbances are real sim changes (forces / friction / leg recolour); arrows and
+labels are post-hoc overlays. Full gallery + the payload comparison:
+[`results/phase3-bio-claims-and-robustness/videos/`](./results/phase3-bio-claims-and-robustness/videos/).
 
 ### The core finding in one comparison (10 kg payload, beyond rated capacity)
 
