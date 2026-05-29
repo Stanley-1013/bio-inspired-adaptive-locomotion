@@ -23,14 +23,18 @@ constraints, not reward devices**. Start here:
 
 ### What torque-based compliance looks like (reproduced SATA reference policy)
 
-One continuous rollout, sequential real disturbances — external pushes, a
-single-leg torque limit (red leg), a vertical impact, low-friction ground —
-each absorbed and recovered from. Forces are applied in-sim; the arrows /
-rings / labels are drawn on each frame afterwards (3D→2D projected) so an
-external force reads as external, not as the robot thrashing. This is the
-compliance that position control's stiffness cannot give.
+The compliance that position control's stiffness cannot give: the policy
+absorbs external disturbances and recovers. Disturbances are applied in-sim;
+the arrows / rings / labels are drawn on each frame afterwards (robot position
+3D→2D projected) so an external force reads as external, not as the robot
+thrashing on its own. Slow-motion + zoom during each event.
 
-![compliance under sequential disturbances](./results/phase3-bio-claims-and-robustness/videos/demo_compliance.gif)
+| External push | External force pulling a leg |
+|---|---|
+| ![push](./results/phase3-bio-claims-and-robustness/videos/ev_push.gif) | ![leg pull](./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif) |
+| Staggers, stays up, recovers. | Resists a persistent pull on one leg (red) and keeps balance — an *external* force, not motor failure. |
+
+More: [vertical impact, stairs, and the full gallery](./results/phase3-bio-claims-and-robustness/videos/).
 
 ### The core finding in one comparison (10 kg payload, beyond rated capacity)
 
