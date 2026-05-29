@@ -38,10 +38,10 @@ event.
 
 | External push | External force pulling a leg |
 |---|---|
-| ![push](./results/phase3-bio-claims-and-robustness/videos/ev_push.gif) | ![leg pull](./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif) |
-| Staggers, stays up, recovers. | Resists a persistent pull on one leg (red) and keeps balance — an *external* force, not motor failure. |
-| ![vertical](./results/phase3-bio-claims-and-robustness/videos/ev_vertical.gif) | ![stairs](./results/phase3-bio-claims-and-robustness/videos/ev_stairs.gif) |
-| **Vertical impact** — absorbed, then recovers. | **Stairs** (hard_terrain policy, trained on stepped terrain). |
+| <img src="./results/phase3-bio-claims-and-robustness/videos/ev_push.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif" width="380"> |
+| Staggers sideways, stays up, recovers. | Resists a persistent pull on one leg (red) — external force, not failure. |
+| <img src="./results/phase3-bio-claims-and-robustness/videos/ev_vertical.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_stairs.gif" width="380"> |
+| Vertical impact — absorbed, then recovers. | Stairs — the stair-trained hard_terrain policy. |
 
 Disturbances are real sim changes (forces / friction / leg recolour); arrows and
 labels are post-hoc overlays. Full gallery + the payload comparison:
