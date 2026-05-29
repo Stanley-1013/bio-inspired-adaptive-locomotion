@@ -43,20 +43,29 @@ CALF_BODY = {"FL": "FL_calf", "FR": "FR_calf", "RL": "RL_calf", "RR": "RR_calf"}
 
 # Each event: total clip seconds, (event_start, event_end) within the clip,
 # terrain, and a label. The event window is slow-mo'd and zoomed.
+# Shorter walk-in (~1.5 s), longer event window, smooth zoom (see ZOOM_LERP).
 EVENTS = {
-    "push":        dict(secs=8.0, win=(3.0, 5.5), terrain="rough",
-                        label="External push", kind="push"),
-    "leg_pull":    dict(secs=9.0, win=(3.0, 6.5), terrain="rough",
-                        label="External force pulling the leg", kind="leg_pull"),
+    # Short windows keep the clip punchy. Event window is 2x slow-mo (see stride
+    # below); too long a window makes the slow-mo drag. Push is +y = perpendicular
+    # to the +x forward motion.
+    "push":        dict(secs=4.5, win=(1.2, 3.2), terrain="rough",
+                        label="External push (lateral)", kind="push"),
+    "leg_pull":    dict(secs=5.5, win=(1.2, 4.2), terrain="rough",
+                        label="External force pulling the leg", kind="leg_pull",
+                        leg="RR"),  # rear-right = near side of the follow-cam → clearest
     # stairs uses the hard_terrain policy (trained on a stairs-heavy mix), not
     # the slope-trained reference, so it actually handles stairs rather than
     # being shown out-of-distribution.
-    "stairs":      dict(secs=9.0, win=(2.0, 8.0), terrain="stairs",
+    # follow-cam (the version that read fine); kept short so it doesn't walk
+    # off the generated terrain patch edge (which caused a fall-into-void)
+    "stairs":      dict(secs=4.5, win=(1.0, 3.5), terrain="stairs",
                         label="Stairs (hard_terrain policy)", kind="terrain",
-                        policy="hard_terrain", side_cam=True),
-    "vertical":    dict(secs=8.0, win=(3.0, 5.5), terrain="rough",
+                        policy="hard_terrain"),
+    "vertical":    dict(secs=4.5, win=(1.2, 3.2), terrain="rough",
                         label="Vertical impact", kind="vertical"),
 }
+
+ZOOM_LERP = 0.6  # seconds to smoothly ease the camera between far and near
 
 
 def project(gym, sim, cam, env, p, W, H):
@@ -98,7 +107,7 @@ def record(event, seed, gpu, out_path, width, height, fps):
     cam_props = gymapi.CameraProperties(); cam_props.width = width; cam_props.height = height
     cam = g.create_camera_sensor(e0, cam_props)
     num_bodies = g.get_actor_rigid_body_count(e0, ah)
-    calf_bi = g.find_actor_rigid_body_handle(e0, ah, CALF_BODY["FL"])
+    calf_bi = g.find_actor_rigid_body_handle(e0, ah, CALF_BODY[cfg_ev.get("leg", "FL")])
     hot = gymapi.Vec3(0.95, 0.15, 0.15); base_col = gymapi.Vec3(0.8, 0.8, 0.85)
 
     ev_a, ev_b = cfg_ev["win"]
@@ -110,7 +119,16 @@ def record(event, seed, gpu, out_path, width, height, fps):
     FAR, NEAR = 2.0, 1.05          # follow-cam distance; zoom in during event
     recolored = False; lowfric_on = False
 
+    push_force = cfg_ev.get("push_force", 150.0)  # 150 N: max that staggers but doesn't reset
+
     print(f"  event={event} secs={secs} win=({ev_a},{ev_b}) steps={n_steps}")
+    cam_dist = FAR                 # smoothly eased toward NEAR during the event
+    # True fall detection: SATA resets (respawns standing) on termination, which
+    # would make any height/orientation check after the fall look "fine". Instead
+    # watch episode_length_buf — it drops to 0 the step a reset happens. A mid-clip
+    # reset (before the natural time-out at the end) means the robot actually fell.
+    min_h = 9.9
+    prev_ep_len = int(env.episode_length_buf[0]); n_resets = 0; reset_steps = []
     for i in range(n_steps):
         t = i * env.dt
         in_event = ev_a <= t < ev_b
@@ -119,21 +137,26 @@ def record(event, seed, gpu, out_path, width, height, fps):
         # ---- real disturbance ----
         forces = None
         if in_event and kind == "push":
-            # one ~0.15 s pulse near the start of the window
-            if t < ev_a + 0.15:
+            # a sharp ~0.2 s lateral pulse (+y, perpendicular to +x motion);
+            # firm enough to clearly shove sideways, the rest of the window is
+            # the stagger + posture recovery in slow-mo
+            if t < ev_a + 0.20:
                 forces = torch.zeros((num_bodies, 3), device=env.device)
-                forces[0, 1] = 220.0
+                forces[0, 1] = push_force
         elif in_event and kind == "leg_pull":
-            # persistent up+out pull on the FL calf, like a hand tugging it
+            # persistent up+out pull on the calf, like a hand tugging it.
+            # Magnitude overridable for calibration (too strong = repeatedly
+            # tugged over, which is a fall, not a balance demo).
+            pf = cfg_ev.get("pull_force", 34.0)  # max that tugs visibly but doesn't reset
             forces = torch.zeros((num_bodies, 3), device=env.device)
-            forces[calf_bi, 1] = 55.0
-            forces[calf_bi, 2] = 45.0
+            forces[calf_bi, 1] = pf
+            forces[calf_bi, 2] = pf * 0.8
             if not recolored:
                 g.set_rigid_body_color(e0, ah, calf_bi, gymapi.MESH_VISUAL, hot); recolored = True
         elif in_event and kind == "vertical":
-            if t < ev_a + 0.15:
+            if t < ev_a + 0.30:
                 forces = torch.zeros((num_bodies, 3), device=env.device)
-                forces[0, 2] = -260.0
+                forces[0, 2] = -150.0
         if forces is not None:
             g.apply_rigid_body_force_tensors(sim, gymtorch.unwrap_tensor(forces), None, gymapi.ENV_SPACE)
 
@@ -149,13 +172,23 @@ def record(event, seed, gpu, out_path, width, height, fps):
         actions = policy(obs.detach())
         obs, _, _, _, _ = env.step(actions.detach())
 
-        # ---- slow-mo: capture every step during event, every 3rd otherwise ----
-        stride = 1 if in_event else 3
+        # ---- fall instrumentation (reset = real fall) ----
+        min_h = min(min_h, float(env.root_states[0, 2]))
+        cur_ep_len = int(env.episode_length_buf[0])
+        if cur_ep_len < prev_ep_len:                  # episode counter reset → fell
+            n_resets += 1; reset_steps.append(round(t, 2))
+        prev_ep_len = cur_ep_len
+
+        # ---- slow-mo: 2x during event (stride 2 vs 4 normal) ----
+        stride = 2 if in_event else 4
         if i % stride != 0:
             continue
 
         base = env.root_states[0, :3].cpu().numpy()
-        dist = NEAR if in_event else FAR
+        # smooth zoom: ease cam_dist toward NEAR in-event, FAR otherwise
+        target = NEAR if in_event else FAR
+        cam_dist += (target - cam_dist) * min(1.0, (env.dt * stride) / ZOOM_LERP)
+        dist = cam_dist
         if cfg_ev.get("side_cam"):
             # low side-on view so stair risers/steps are visible in profile
             g.set_camera_location(cam, e0,
@@ -173,7 +206,10 @@ def record(event, seed, gpu, out_path, width, height, fps):
         arrow = ring = None
         label = cfg_ev["label"] + ("  (slow-mo)" if in_event else "")
         if in_event and kind == "push" and scr:
-            arrow = dict(tip=scr, angle_deg=90, color=(255, 60, 60), length=120)
+            # horizontal arrow → reads as a sideways shove (only while the pulse
+            # is active + a short bit after, so it doesn't linger through recovery)
+            if t < ev_a + 0.6:
+                arrow = dict(tip=scr, angle_deg=0, color=(255, 60, 60), length=130)
         elif in_event and kind == "vertical" and scr:
             arrow = dict(tip=(scr[0], scr[1] - 30), angle_deg=-90, color=(255, 120, 40), length=120)
             ring = dict(center=scr, r=40)
@@ -187,7 +223,10 @@ def record(event, seed, gpu, out_path, width, height, fps):
         writer.append_data(np.ascontiguousarray(frame))
 
     writer.close()
+    fell = n_resets > 0
     print(f"  wrote {out_path}")
+    print(f"  FALL_CHECK event={event} fell={fell} resets={n_resets} "
+          f"reset_t={reset_steps} min_h={min_h:.3f}")
 
 
 def main():
@@ -199,7 +238,15 @@ def main():
     ap.add_argument("--height", type=int, default=540)
     ap.add_argument("--fps", type=int, default=30)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--push-force", type=float, default=None,
+                    help="override push force (N) for calibration")
+    ap.add_argument("--pull-force", type=float, default=None,
+                    help="override leg-pull force (N) for calibration")
     a = ap.parse_args()
+    if a.push_force is not None:
+        EVENTS["push"]["push_force"] = a.push_force
+    if a.pull_force is not None:
+        EVENTS["leg_pull"]["pull_force"] = a.pull_force
     record(a.event, a.seed, a.gpu, a.out, a.width, a.height, a.fps)
 
 
