@@ -1,0 +1,20 @@
+# Additions to ~/workspace/SATA/legged_gym/legged_gym/envs/__init__.py
+# to register the 5 Phase 2 ablation tasks.
+#
+# Add these import lines next to the existing GO2Torque imports:
+
+from .go2.go2_torque.go2_torque_ablations import (
+    GO2TorqueNoFatigueCfg,
+    GO2TorqueNoHillCfg,
+    GO2TorqueNoActivationCfg,
+    GO2TorqueNoGrowthCfg,
+    GO2TorqueHardTerrainCfg,
+)
+
+# Then add these registrations next to the existing task_registry.register calls:
+
+task_registry.register("go2_torque_no_fatigue",    GO2Torque, GO2TorqueNoFatigueCfg(),    GO2TorqueCfgPPO())
+task_registry.register("go2_torque_no_hill",       GO2Torque, GO2TorqueNoHillCfg(),       GO2TorqueCfgPPO())
+task_registry.register("go2_torque_no_activation", GO2Torque, GO2TorqueNoActivationCfg(), GO2TorqueCfgPPO())
+task_registry.register("go2_torque_no_growth",     GO2Torque, GO2TorqueNoGrowthCfg(),     GO2TorqueCfgPPO())
+task_registry.register("go2_torque_hard_terrain",  GO2Torque, GO2TorqueHardTerrainCfg(),  GO2TorqueCfgPPO())

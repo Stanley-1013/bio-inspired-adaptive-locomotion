@@ -1,0 +1,25 @@
+# Local-only Claude settings (not the shared settings.json)
+.claude/settings.local.json
+
+# Symlinks into the sibling SATA repo's training artifacts (binary, multi-GB)
+results/raw
+results/**/raw
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Node (deck toolchain)
+node_modules/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor noise
+.vscode/
+.idea/
+*.swp

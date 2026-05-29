@@ -48,9 +48,13 @@ pip3 install torch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 \
 ```bash
 git clone https://github.com/marmotlab/SATA
 cd SATA
+git checkout 8fc422af3fec463a408779b1685c2453d0040be8  # commit used in this study
 pip install -e rsl_rl       # the repo's customized rsl_rl
 pip install -e legged_gym   # the repo's customized legged_gym
 ```
+
+> The commit hash above is what Phase 1 reproduction was run against. Newer
+> SATA commits may work but are untested by this project.
 
 Pinned extras required by SATA:
 
@@ -65,9 +69,13 @@ pip install wandb
 
 ```bash
 cd SATA/legged_gym/legged_gym
-python scripts/train.py --task=go2_torque            # add --headless to disable GUI
+WANDB_MODE=disabled python scripts/train.py --task=go2_torque --headless
 # task config: legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py
+# logs land at: SATA/legged_gym/logs/SATA/<timestamp>/
 ```
+
+`rsl_rl` hard-imports `wandb` (see Troubleshooting); `WANDB_MODE=disabled` makes
+it a no-op without needing `wandb login`.
 
 GUI play controls: press `v` to pause/resume.
 
@@ -77,12 +85,42 @@ GUI play controls: press `v` to pause/resume.
 python scripts/play.py --task=go2_torque
 ```
 
-## Troubleshooting (from the SATA README)
+## Troubleshooting
+
+From the SATA README:
 
 - **CUDA errors with many parallel envs** on some GPU/driver combos — reduce
   `num_envs`.
 - The codebase targets the authors' hardware; it is a reference, not tuned for
   other robots.
+
+Observed on Ubuntu 22.04+ hosts (system Python is no longer 3.8):
+
+- **`ImportError: libpython3.8.so.1.0: cannot open shared object file`** when
+  importing `isaacgym`. Fix by pointing `LD_LIBRARY_PATH` at the conda env's
+  lib (it ships `libpython3.8.so.1.0`). Make it permanent so every
+  `conda activate sata` sets it:
+
+  ```bash
+  mkdir -p $CONDA_PREFIX/etc/conda/activate.d $CONDA_PREFIX/etc/conda/deactivate.d
+  cat > $CONDA_PREFIX/etc/conda/activate.d/ld_library_path.sh <<'EOF'
+  export _OLD_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
+  export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
+  EOF
+  cat > $CONDA_PREFIX/etc/conda/deactivate.d/ld_library_path.sh <<'EOF'
+  export LD_LIBRARY_PATH="${_OLD_LD_LIBRARY_PATH:-}"
+  unset _OLD_LD_LIBRARY_PATH
+  EOF
+  ```
+
+- **`ModuleNotFoundError: No module named 'wandb'`** at import time, even when
+  you don't intend to use it. `rsl_rl/runners/on_policy_runner.py` has a hard
+  `import wandb`. Just `pip install wandb` (no `wandb login` needed) and prefix
+  training with `WANDB_MODE=disabled` if you don't want it logging.
+
+- **`ImportError: PyTorch was imported before isaacgym modules`** in scripts of
+  your own. Always `import isaacgym` *before* `import torch`. `train.py`
+  already does this.
 
 ## What maps to our project phases
 

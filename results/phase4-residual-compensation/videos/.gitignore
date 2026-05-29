@@ -1,0 +1,3 @@
+# Full-res mp4 clips are large and kept out of git; link them externally.
+# Only the small inline GIFs are committed.
+*.mp4

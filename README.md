@@ -1,19 +1,50 @@
 # Bio-inspired Adaptive Locomotion via Torque-based Learning
 
-**A Case Study of SATA**
+**A Case Study of SATA** — a simulation-based study using adaptive and robust
+control questions as a lens.
 
-*A simulation-based study using adaptive and robust control questions as a lens.*
+This project reproduces **SATA** (Safe and Adaptive Torque-Based Locomotion
+Policies Inspired by Animal Learning; Li et al., RSS 2025; [official
+repo](https://github.com/marmotlab/SATA)) and investigates how its bio-inspired
+torque control produces adaptive locomotion. Educational and research use.
 
-This project reproduces and studies **SATA** (Safe and Adaptive Torque-Based
-Locomotion Policies Inspired by Animal Learning; Li et al., RSS 2025).
+**Current status (2026-05-29):** Phases 1–4 complete. We reproduce the SATA
+reference, ablate each bio-inspired mechanism (8 seeds), evaluate all 48
+policies under perturbation, and probe a classical residual — then read the
+whole thing through adaptive/robust control's questions. Headline: on *training
+reward* alone, removing the fatigue or activation constraint slightly *raises*
+reward, but Phase 3 shows those ablations only "win" by leaving the
+hardware-realisable torque envelope (`no_activation` peaks at 42.5 N·m vs the
+real Go2's 45 N·m limit). The bio mechanisms are **sim-to-real feasibility
+constraints, not reward devices**. Start here:
+[`docs/sata-overview.md`](./docs/sata-overview.md) (what SATA contributes) ·
+[`docs/control-perspective.md`](./docs/control-perspective.md) (the synthesis) ·
+[results phases 1–4](./results/) · [`docs/setup-sata.md`](./docs/setup-sata.md).
 
-Rather than proposing a new controller, this work investigates how bio-inspired
-torque control creates adaptive locomotion behaviors, and discusses these
-mechanisms through **adaptive and robust control questions**.
+### What torque-based compliance looks like (reproduced SATA reference policy)
 
-Official implementation: https://github.com/marmotlab/SATA
+The compliance that position control's stiffness cannot give: the policy
+absorbs external disturbances and recovers. Disturbances are applied in-sim;
+the arrows / rings / labels are drawn on each frame afterwards (robot position
+3D→2D projected) so an external force reads as external, not as the robot
+thrashing on its own. Slow-motion + zoom during each event.
 
-This repository is intended for educational and research purposes.
+| External push | External force pulling a leg |
+|---|---|
+| ![push](./results/phase3-bio-claims-and-robustness/videos/ev_push.gif) | ![leg pull](./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif) |
+| Staggers, stays up, recovers. | Resists a persistent pull on one leg (red) and keeps balance — an *external* force, not motor failure. |
+
+More: [vertical impact, stairs, and the full gallery](./results/phase3-bio-claims-and-robustness/videos/).
+
+### The core finding in one comparison (10 kg payload, beyond rated capacity)
+
+| reference (full SATA) — reproduces the paper's §VI-A payload limit | `no_fatigue` ablation — stays up, but by hardware-infeasible thrashing |
+|---|---|
+| ![reference under payload](./results/phase3-bio-claims-and-robustness/videos/02_reference_payload10.gif) | ![no_fatigue under payload](./results/phase3-bio-claims-and-robustness/videos/03_no_fatigue_payload10.gif) |
+| The fatigue constraint refuses the sustained torque needed for an over-rated load → the robot goes down (the paper's own stated limitation). | Removing fatigue keeps it upright under the same load — but at 2.5× energy / 35× action-jerk, behaviour a real motor could not hold. |
+
+More clips: [Phase 3 gallery](./results/phase3-bio-claims-and-robustness/videos/) ·
+[Phase 4 gallery](./results/phase4-residual-compensation/videos/).
 
 **Keywords:** Embodied AI · Adaptive Control · RL · Torque Control · Locomotion
 
@@ -21,37 +52,89 @@ This repository is intended for educational and research purposes.
 
 ## Overview
 
-This project takes SATA as its main subject. We first **reproduce** its
-torque-based locomotion pipeline in simulation, then use **ablation
-experiments** to observe how the biomechanical model, fatigue feedback, and
-growth mechanism shape adaptive behavior. Finally — and this is the framing that
-matters — we do **not** force SATA into classical control theory. Instead we let
-**adaptive / robust control supply the questions** (how to stay stable under
-unknown dynamics, reject disturbances, generalize) and observe **how SATA
-answers them differently** — with learning and biomechanics rather than analytic
-control laws. If time allows, we further test a simple **residual compensation**
-term in boundary cases.
+We take SATA as the main subject: **reproduce** its torque-based locomotion
+pipeline in simulation, then **ablate** the biomechanical model, fatigue
+feedback, and growth mechanism to see how each shapes adaptive behavior.
+Crucially, we do **not** force SATA into classical control theory. Instead we
+let **adaptive / robust control supply the questions** — stability under
+unknown dynamics, disturbance rejection, generalization — and observe **how
+SATA answers them differently**, with learning and biomechanics rather than
+analytic control laws. If time allows, we also test a simple **residual
+compensation** term in boundary cases.
 
 > Framing: the goal is **not** to claim SATA *is* adaptive control. SATA is a
 > learning-based policy with no Lyapunov-based update law or online parameter
-> estimation. We instead **compare two philosophies of handling adaptation** —
-> classical adaptive/robust control vs. learning + bio-inspired mechanisms —
-> using the former's questions as a lens.
+> estimation. We instead **compare two philosophies of adaptation** — classical
+> adaptive/robust control vs. learning + bio-inspired mechanisms — using the
+> former's questions as a lens.
+
+## Status
+
+- **Phase 1 (Reproduce) — done (2026-05-26).** 8 SATA reference seeds →
+  mean reward **104 ± 16** at iter 3000 (initial 3 seeds were 114 ± 6; the
+  expanded sample reveals genuinely larger seed-to-seed variance, including
+  one late-training PPO collapse).
+  [`results/phase1-reference/`](./results/phase1-reference/)
+- **Phase 2 (Ablation) — done (2026-05-27).** 5 single-knob ablations × 8
+  seeds each, evaluated on *training-distribution reward*. Removing the
+  fatigue or activation constraint *raises* training reward (`no_fatigue`
+  +22, p = 0.006; `no_activation` +24, p = 0.003); `no_hill` and `no_growth`
+  are not significantly different from reference (p ≈ 0.5, 0.8). **This is
+  the expected sign of a working sim-to-real constraint** — a bound that
+  protects hardware costs a little reward in a clean simulator — not evidence
+  the mechanisms are useless. Their value is assessed out-of-distribution in
+  Phase 3, not here. [`results/phase2-ablation/`](./results/phase2-ablation/)
+- **Phase 3 (Bio-claims & OOD robustness) — done (2026-05-29).** All 48
+  policies evaluated under payload/push perturbations + actuator-feasibility
+  metrics (384 cells). The ablations that won Phase 2 reward turn out to leave
+  the hardware-realisable envelope: `no_activation` peaks at **42.5 N·m**
+  (≈ the real Go2's 45 N·m limit), `no_fatigue` uses **2.5× energy / 35× jerk**
+  (all p<0.001). The fatigue/activation constraints cost training reward but
+  keep the policy hardware-realisable. Caveat: simulation only, no thermal model.
+  [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
+- **Phase 4 (Residual compensation) — done (2026-05-29).** A simple stance-gated
+  classical height-PD residual `τ_total = τ_SATA + τ_comp`, bolted onto the
+  frozen reference policy, gives a small, borderline-significant payload-reward
+  recovery (8 kg: +37 %, p=0.045) **within the actuator envelope and harmless at
+  nominal** — but only ~1/4 of the way to the no_fatigue ablation, because the
+  frozen policy treats the residual as a disturbance. Motivates co-trained
+  RL+adaptation (RL2AC). [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
+- **Synthesis — the control-theoretic reading** (delivers this project's
+  original framing): [`docs/control-perspective.md`](./docs/control-perspective.md)
+  maps every finding onto the questions adaptive/robust control asks, and
+  corrects two tempting-but-wrong analogies using the data.
 
 ## Repository
 
 ```
-docs/   progress-report deck (pptx + pdf), design brief, SATA setup guide
-scripts/  setup + deck-build scripts, and the pptxgenjs deck generator
-.claude/  SessionStart hook (auto-runs scripts/setup.sh on web sessions)
+docs/      design brief, SATA setup, training-internals walkthrough, concepts primer
+results/   per-phase outcomes (text summaries; raw checkpoints live on NAS via symlink)
+scripts/   setup + sata-env helper + deck-build scripts + pptxgenjs deck generator
+.claude/   SessionStart hook (auto-runs scripts/setup.sh on web sessions)
+LICENSE    MIT
 ```
 
-- **Progress report:** `docs/20260525_progress_report_v1.pptx` / `.pdf`
-  (spec in `docs/progress-report-design-brief.md`).
-- **Reproduce SATA (needs a GPU box):** see `docs/setup-sata.md`.
-- **Rebuild the deck:** `bash scripts/setup.sh` then `bash scripts/build-deck.sh`.
-  (Deck build uses pptxgenjs + LibreOffice; SATA itself does **not** run in the
-  Claude Code web sandbox — no GPU / Isaac Gym.)
+Documentation:
+- **What SATA contributes & why it's worth reproducing (start here):**
+  [`docs/sata-overview.md`](./docs/sata-overview.md)
+- **Project design brief:** [`docs/progress-report-design-brief.md`](./docs/progress-report-design-brief.md)
+- **Progress report deck:** [`docs/20260525_progress_report_v1.pdf`](./docs/20260525_progress_report_v1.pdf) / [`.pptx`](./docs/20260525_progress_report_v1.pptx)
+- **Reproduce SATA (needs a GPU box):** [`docs/setup-sata.md`](./docs/setup-sata.md)
+- **What the training code actually does:** [`docs/training-internals.md`](./docs/training-internals.md)
+- **Primer for the underlying terms** (torque control, Hill model, PPO, etc.):
+  [`docs/concepts-primer.md`](./docs/concepts-primer.md)
+- **Control-theoretic synthesis (the framing capstone):**
+  [`docs/control-perspective.md`](./docs/control-perspective.md)
+
+Results:
+- **Phase 1 — reference reproduction:** [`results/phase1-reference/`](./results/phase1-reference/)
+- **Phase 2 — ablation:** [`results/phase2-ablation/`](./results/phase2-ablation/)
+- **Phase 3 — bio-claims & OOD robustness:** [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
+- **Phase 4 — residual compensation:** [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
+
+To rebuild the slide deck (deck toolchain only — SATA training requires a GPU
+and Isaac Gym, which the Claude Code web sandbox lacks):
+`bash scripts/setup.sh && bash scripts/build-deck.sh`.
 
 ## 1. Motivation & Problem
 
@@ -141,6 +224,12 @@ a lens for discussion, not equivalence:
 
 *SATA has no Lyapunov-based update law or online parameter estimation — these
 are framing lenses, not formal equivalences.*
+
+> **These tables are now backed by data and partly corrected** in
+> [`docs/control-perspective.md`](./docs/control-perspective.md): the Phase 2–4
+> experiments confirm the Hill/activation ↔ learned-in actuator-feasibility
+> reading, but **down-grade** the "fatigue ↔ disturbance compensation" and
+> "growth ↔ gain scheduling" analogies above — both fail against the evidence.
 
 ## 6. Expected Outcomes
 
