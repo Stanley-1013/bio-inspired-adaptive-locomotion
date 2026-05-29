@@ -23,11 +23,18 @@ constraints, not reward devices**. Start here:
 
 ### What torque-based compliance looks like (reproduced SATA reference policy)
 
-The compliance that position control's stiffness cannot give: the policy
-absorbs external disturbances and recovers. Disturbances are applied in-sim;
-the arrows / rings / labels are drawn on each frame afterwards (robot position
-3D→2D projected) so an external force reads as external, not as the robot
-thrashing on its own. Slow-motion + zoom during each event.
+The SATA paper's central claim for torque control is **compliance**: where a
+position-based policy is *"very stiff … nearly unable to be displaced without
+stepping"* and can over-react to disturbances (§V-B1), a torque policy yields
+naturally — it absorbs an external force and recovers. We did **not** train a
+position-control baseline (that contrast is the paper's, quoted above); the
+clips below show the *SATA side* of it — our reproduced reference policy
+absorbing and recovering from disturbances.
+
+Disturbances are applied in-sim; the arrows / rings / labels are drawn on each
+frame afterwards (robot position 3D→2D projected) so an external force reads as
+external, not as the robot thrashing on its own. Slow-motion + zoom during each
+event.
 
 | External push | External force pulling a leg |
 |---|---|
