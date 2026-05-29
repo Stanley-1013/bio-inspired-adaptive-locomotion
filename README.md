@@ -89,6 +89,8 @@ LICENSE    MIT
 ```
 
 Documentation:
+- **What SATA contributes & why it's worth reproducing (start here):**
+  [`docs/sata-overview.md`](./docs/sata-overview.md)
 - **Project design brief:** [`docs/progress-report-design-brief.md`](./docs/progress-report-design-brief.md)
 - **Progress report deck:** [`docs/20260525_progress_report_v1.pdf`](./docs/20260525_progress_report_v1.pdf) / [`.pptx`](./docs/20260525_progress_report_v1.pptx)
 - **Reproduce SATA (needs a GPU box):** [`docs/setup-sata.md`](./docs/setup-sata.md)
