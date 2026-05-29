@@ -21,6 +21,17 @@ constraints, not reward devices**. Start here:
 [`docs/control-perspective.md`](./docs/control-perspective.md) (the synthesis) ·
 [results phases 1–4](./results/) · [`docs/setup-sata.md`](./docs/setup-sata.md).
 
+### What torque-based compliance looks like (reproduced SATA reference policy)
+
+One continuous rollout, sequential real disturbances — external pushes, a
+single-leg torque limit (red leg), a vertical impact, low-friction ground —
+each absorbed and recovered from. Forces are applied in-sim; the arrows /
+rings / labels are drawn on each frame afterwards (3D→2D projected) so an
+external force reads as external, not as the robot thrashing. This is the
+compliance that position control's stiffness cannot give.
+
+![compliance under sequential disturbances](./results/phase3-bio-claims-and-robustness/videos/demo_compliance.gif)
+
 ### The core finding in one comparison (10 kg payload, beyond rated capacity)
 
 | reference (full SATA) — reproduces the paper's §VI-A payload limit | `no_fatigue` ablation — stays up, but by hardware-infeasible thrashing |

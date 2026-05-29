@@ -5,6 +5,18 @@ mp4s are kept out of git (`.gitignore`) and can be linked externally. All clips
 use a follow-camera; each policy runs in the env matching its own training
 config. Recorded with [`../../../analysis/record_video.py`](../../../analysis/record_video.py).
 
+## Compliance under sequential disturbances (the integrated demo)
+One continuous rollout of the reference policy: external pushes → single-leg
+torque limit (red leg) → vertical impact → low-friction ground, each absorbed
+and recovered. Disturbances are real (forces applied in-sim, leg torque really
+limited, friction really lowered, leg really recoloured); the arrows / rings /
+labels are post-hoc overlays (3D→2D projected onto each frame, see
+[`../../../analysis/record_demo.py`](../../../analysis/record_demo.py) +
+[`overlay.py`](../../../analysis/overlay.py)) so an external force reads as
+external. GIF is a 12 s highlight; the full 22 s mp4 is kept out of git.
+
+![compliance demo](./demo_compliance.gif)
+
 ## Reference walking (nominal rough terrain)
 The reproduced SATA reference policy walking — smooth, compliant gait.
 
