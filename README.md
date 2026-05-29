@@ -23,18 +23,29 @@ constraints, not reward devices**. Start here:
 
 ### What torque-based compliance looks like (reproduced SATA reference policy)
 
-The compliance that position control's stiffness cannot give: the policy
-absorbs external disturbances and recovers. Disturbances are applied in-sim;
-the arrows / rings / labels are drawn on each frame afterwards (robot position
-3D→2D projected) so an external force reads as external, not as the robot
-thrashing on its own. Slow-motion + zoom during each event.
+The SATA paper's central claim for torque control is **compliance**: where a
+position-based policy is *"very stiff … nearly unable to be displaced without
+stepping"* and can over-react to disturbances (§V-B1), a torque policy yields
+naturally — it absorbs an external force and recovers. We did **not** train a
+position-control baseline (that contrast is the paper's, quoted above); the
+clips below show the *SATA side* of it — our reproduced reference policy
+absorbing and recovering from disturbances.
+
+Disturbances are applied in-sim; the arrows / rings / labels are drawn on each
+frame afterwards (robot position 3D→2D projected) so an external force reads as
+external, not as the robot thrashing on its own. Slow-motion + zoom during each
+event.
 
 | External push | External force pulling a leg |
 |---|---|
-| ![push](./results/phase3-bio-claims-and-robustness/videos/ev_push.gif) | ![leg pull](./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif) |
-| Staggers, stays up, recovers. | Resists a persistent pull on one leg (red) and keeps balance — an *external* force, not motor failure. |
+| <img src="./results/phase3-bio-claims-and-robustness/videos/ev_push.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif" width="380"> |
+| Staggers sideways, stays up, recovers. | Resists a persistent pull on one leg (red) — external force, not failure. |
+| <img src="./results/phase3-bio-claims-and-robustness/videos/ev_vertical.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_stairs.gif" width="380"> |
+| Vertical impact — absorbed, then recovers. | Stairs — the stair-trained hard_terrain policy. |
 
-More: [vertical impact, stairs, and the full gallery](./results/phase3-bio-claims-and-robustness/videos/).
+Disturbances are real sim changes (forces / friction / leg recolour); arrows and
+labels are post-hoc overlays. Full gallery + the payload comparison:
+[`results/phase3-bio-claims-and-robustness/videos/`](./results/phase3-bio-claims-and-robustness/videos/).
 
 ### The core finding in one comparison (10 kg payload, beyond rated capacity)
 
