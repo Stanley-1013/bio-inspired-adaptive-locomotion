@@ -22,9 +22,9 @@ A 12-DOF **Unitree Go2** quadruped learns to follow `(v_x, v_y, ω_yaw)` velocit
 
 ## 動作到關節力矩流程 / Action to Joint Torque Pipeline
 
-策略輸出的 12 維動作 `a` 並不直接等於關節力矩。每個 step 會在 [go2_torque.py:221-248](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L221) 中經過四個階段。
+策略輸出的 12 維動作 `a` 並不直接等於關節力矩。每個 step 會在 [go2_torque.py:221-248](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L221) 中經過四個階段。
 
-The policy's 12-dimensional action `a` is not directly the joint torque. Four processing stages are applied each step in [go2_torque.py:221-248](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L221).
+The policy's 12-dimensional action `a` is not directly the joint torque. Four processing stages are applied each step in [go2_torque.py:221-248](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L221).
 
 1. **縮放 / Scale**
 
@@ -67,15 +67,15 @@ The policy's 12-dimensional action `a` is not directly the joint torque. Four pr
 
    Each DOF has a leaky accumulator. The effective time constant is about 10 control steps, or roughly 50 ms at 200 Hz. The fatigue vector is included in the observation, so the policy observes its own fatigue state.
 
-以上三個仿生階段可在 [go2_torque_config.py:102-108](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L102) 中各自關閉，用於 ablation study。
+以上三個仿生階段可在 [go2_torque_config.py:102-108](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L102) 中各自關閉，用於 ablation study。
 
-Each biomechanical stage can be ablated independently by flipping its boolean in [go2_torque_config.py:102-108](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L102).
+Each biomechanical stage can be ablated independently by flipping its boolean in [go2_torque_config.py:102-108](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L102).
 
 ## 成長課程 / Growth Curriculum
 
-`general_scale ∈ [0, 1]` 是控制「發育程度」的單一 scalar，會沿著 Gompertz curve 在 [go2_torque.py:183](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L183) 中逐漸上升。
+`general_scale ∈ [0, 1]` 是控制「發育程度」的單一 scalar，會沿著 Gompertz curve 在 [go2_torque.py:183](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L183) 中逐漸上升。
 
-`general_scale ∈ [0, 1]` is a single developmental-capacity scalar. It ramps along a Gompertz curve in [go2_torque.py:183](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L183).
+`general_scale ∈ [0, 1]` is a single developmental-capacity scalar. It ramps along a Gompertz curve in [go2_torque.py:183](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L183).
 
 ```text
 general_scale = exp(-exp(-k * (step - x0)))    # k=3e-5, x0=24,000
@@ -100,9 +100,9 @@ To disable the entire curriculum, set `control_type='T'` instead of `control_typ
 
 ## 獎勵函數 / Reward Function
 
-獎勵設定來自 [go2_torque_config.py:129-139](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L129)。
+獎勵設定來自 [go2_torque_config.py:129-139](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L129)。
 
-The reward scales come from [go2_torque_config.py:129-139](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L129).
+The reward scales come from [go2_torque_config.py:129-139](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque_config.py#L129).
 
 | 項目 / Term | Scale | 鼓勵或懲罰內容 / Incentive |
 |---|---:|---|
@@ -122,13 +122,13 @@ The `motor_fatigue` scale is intentionally small: `-0.05`, not `-5`. It nudges t
 
 ## 一次 PPO 迭代 / One PPO Iteration
 
-核心流程在 [on_policy_runner.py:127-154](/home/han/workspace/SATA/rsl_rl/rsl_rl/runners/on_policy_runner.py#L127)。
+核心流程在 [on_policy_runner.py:127-154](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/rsl_rl/rsl_rl/runners/on_policy_runner.py#L127)。
 
-The core loop is in [on_policy_runner.py:127-154](/home/han/workspace/SATA/rsl_rl/rsl_rl/runners/on_policy_runner.py#L127).
+The core loop is in [on_policy_runner.py:127-154](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/rsl_rl/rsl_rl/runners/on_policy_runner.py#L127).
 
 - Rollout: `24 steps * 4096 parallel envs = ~98k transitions / iteration`
 - 每次 iteration 的更新量 / Updates per iteration: `5 epochs * 4 mini-batches = 20 gradient steps`
-- Loss，見 [ppo.py:171](/home/han/workspace/SATA/rsl_rl/rsl_rl/algorithms/ppo.py#L171):
+- Loss，見 [ppo.py:171](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/rsl_rl/rsl_rl/algorithms/ppo.py#L171):
 
   ```text
   L = clipped_surrogate(epsilon=0.2)
@@ -144,9 +144,9 @@ At 3000 iterations, the policy has seen about `295M` environment transitions.
 
 ## 網路形狀 / Network Shape
 
-Actor 與 critic 都定義在 [actor_critic.py:38-80](/home/han/workspace/SATA/rsl_rl/rsl_rl/modules/actor_critic.py#L38)。
+Actor 與 critic 都定義在 [actor_critic.py:38-80](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/rsl_rl/rsl_rl/modules/actor_critic.py#L38)。
 
-Both actor and critic are defined in [actor_critic.py:38-80](/home/han/workspace/SATA/rsl_rl/rsl_rl/modules/actor_critic.py#L38).
+Both actor and critic are defined in [actor_critic.py:38-80](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/rsl_rl/rsl_rl/modules/actor_critic.py#L38).
 
 - 輸入 / Input: 60 維 observation；actor 與 critic 使用相同 observation，沒有 privileged information
 - 隱藏層 / Hidden layers: `[512, 256, 128]`，activation 為 ELU
@@ -158,9 +158,9 @@ Total parameters are about 400k. The observed 5.8 GB VRAM usage is mostly the ro
 
 ### Observation 組成 / Observation Composition
 
-Observation 來源見 [go2_torque.py:285-295](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L285)。
+Observation 來源見 [go2_torque.py:285-295](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L285)。
 
-The observation is assembled in [go2_torque.py:285-295](/home/han/workspace/SATA/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L285).
+The observation is assembled in [go2_torque.py:285-295](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L285).
 
 | Indices | 內容 / Content |
 |---|---|
