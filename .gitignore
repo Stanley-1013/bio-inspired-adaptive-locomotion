@@ -23,3 +23,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# Generated self-contained deck (regenerate: python scripts/inline-presentation.py)
+docs/final-presentation.standalone.html
