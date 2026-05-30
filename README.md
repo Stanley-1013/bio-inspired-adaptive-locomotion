@@ -39,7 +39,7 @@ event.
 | External push | External force pulling a leg |
 |---|---|
 | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_push.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_leg_pull.gif" width="380"> |
-| Staggers sideways, stays up, recovers. | Resists a persistent pull on one leg (red) — external force, not failure. |
+| Staggers sideways, stays up, recovers. | Resists a persistent pull on one leg (red) |
 | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_vertical.gif" width="380"> | <img src="./results/phase3-bio-claims-and-robustness/videos/ev_stairs.gif" width="380"> |
 | Vertical impact — absorbed, then recovers. | Stairs — the stair-trained hard_terrain policy. |
 
