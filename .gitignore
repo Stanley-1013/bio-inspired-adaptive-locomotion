@@ -26,3 +26,6 @@ Thumbs.db
 
 # Generated self-contained deck (regenerate: python scripts/inline-presentation.py)
 docs/final-presentation.standalone.html
+
+# Personal speaker notes (zh-TW) — presentation prep, not a repo artifact
+docs/final-presentation-script.md
