@@ -1,0 +1,12 @@
+[Tue Jun  2 03:15:55 CST 2026] Phase 5 start — task=go2_torque_no_biomech gpu=0 seeds=[1 2 3 4 5] iters=3000 envs=4096
+[Tue Jun  2 03:15:55 CST 2026] === seed 1 START ===
+[Tue Jun  2 04:24:05 CST 2026] === seed 1 DONE (exit 0) ===
+[Tue Jun  2 04:24:05 CST 2026] === seed 2 START ===
+[Tue Jun  2 05:32:23 CST 2026] === seed 2 DONE (exit 0) ===
+[Tue Jun  2 05:32:23 CST 2026] === seed 3 START ===
+[Tue Jun  2 06:40:39 CST 2026] === seed 3 DONE (exit 0) ===
+[Tue Jun  2 06:40:39 CST 2026] === seed 4 START ===
+[Tue Jun  2 07:49:37 CST 2026] === seed 4 DONE (exit 0) ===
+[Tue Jun  2 07:49:37 CST 2026] === seed 5 START ===
+[Tue Jun  2 08:58:18 CST 2026] === seed 5 DONE (exit 0) ===
+[Tue Jun  2 08:58:18 CST 2026] Phase 5 ALL DONE
