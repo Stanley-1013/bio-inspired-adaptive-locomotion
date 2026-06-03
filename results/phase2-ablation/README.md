@@ -71,7 +71,7 @@ bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_
 > serves sim-to-real will, by construction, often *cost* a little training
 > reward in a clean simulator — so "ablating it raises reward" is the
 > *expected* sign of a working constraint, not evidence the mechanism is
-> useless. The decisive evaluation of these mechanisms is the out-of-distribution
+> useless. The more informative evaluation of these mechanisms is the out-of-distribution
 > / feasibility analysis in [`../phase3-bio-claims-and-robustness/`](../phase3-bio-claims-and-robustness/),
 > not this table. Treat the numbers here as *characterising the cost of each
 > constraint in-distribution*, and read them alongside that caveat.

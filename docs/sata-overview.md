@@ -44,9 +44,10 @@ stays in a biologically/physically plausible range.
 **→ in this repo:** [Phase 3](../results/phase3-bio-claims-and-robustness/)
 measures exactly this. Ablating the activation layer lets peak torque jump to
 **42.5 N·m** — right at the real Go2's 45 N·m actuator limit (~1.8× the sim's own
-23.5 N·m clip). So the layer's measurable function is to keep the policy inside a
-hardware-realisable torque envelope. The biomechanical model is, in control
-terms, a **learned-in saturation/rate limit** (see control-perspective Q4).
+23.5 N·m clip). So on the axis we measured, the layer's main effect is to keep
+the policy inside a hardware-realisable torque envelope. The biomechanical model
+looks, in control terms, like a **learned-in saturation/rate limit** (see
+control-perspective Q4).
 
 ### 2. A motor-fatigue feedback state
 Each joint carries a leaky-integrator "fatigue" state (accumulates with torque,
@@ -66,7 +67,7 @@ effort-regulariser, **not** a disturbance compensator — push hits every condit
 alike; see control-perspective Q2.)
 
 ### 3. A growth mechanism (developmental curriculum)
-The cleverest design. Borrowing from animal development, a single Gompertz curve
+The most striking of the three, to us. Borrowing from animal development, a single Gompertz curve
 **progressively unlocks the robot's hardware** over training — torque ceiling
 0.3→1.0, control frequency 100→200 Hz — while simultaneously reshaping the reward
 weights. Early training happens in an "infant" body that is easy to control,

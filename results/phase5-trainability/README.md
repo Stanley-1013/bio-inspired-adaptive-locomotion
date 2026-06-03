@@ -21,6 +21,10 @@ kept on (config in
 
 (std is sample std, ddof=1, to match the reference convention.)
 
+The higher reward here is **not** a refutation of the paper — our all-off knobs
+are a different baseline (scaled raw torque), and reward is not gait quality.
+See "Why we did not push this further" below.
+
 The resulting policy walks and tracks the velocity command; posture and contact
 pattern are close to the reference:
 

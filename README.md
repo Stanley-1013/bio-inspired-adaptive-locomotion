@@ -47,7 +47,7 @@ Disturbances are real sim changes (forces / friction / leg recolour); arrows and
 labels are post-hoc overlays. Full gallery + the payload comparison:
 [`results/phase3-bio-claims-and-robustness/videos/`](./results/phase3-bio-claims-and-robustness/videos/).
 
-### The core finding in one comparison (10 kg payload, beyond rated capacity)
+### What we observed, in one comparison (10 kg payload, beyond rated capacity)
 
 | reference (full SATA) — reproduces the paper's §VI-A payload limit | `no_fatigue` ablation — stays up, but by hardware-infeasible thrashing |
 |---|---|
@@ -111,8 +111,8 @@ compensation** term in boundary cases.
   no_fatigue ablation, because the
   frozen policy treats the residual as a disturbance. Motivates co-trained
   RL+adaptation (RL2AC). [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
-- **Synthesis — the control-theoretic reading** (delivers this project's
-  original framing): [`docs/control-perspective.md`](./docs/control-perspective.md)
+- **Synthesis — the control-theoretic reading** (the framing this project set
+  out to apply): [`docs/control-perspective.md`](./docs/control-perspective.md)
   maps every finding onto the questions adaptive/robust control asks, and
   corrects two tempting-but-wrong analogies using the data.
 
@@ -164,7 +164,7 @@ fatigue, growth) to achieve safe and adaptive locomotion.
 - *(Optional, if time allows)* Explore a lightweight **residual compensation**
   term to handle boundary cases.
 
-**Key contribution:** **contrast two philosophies of adaptation** —
+**What we aimed for:** **contrast two philosophies of adaptation** —
 learning-based locomotion vs. classical adaptive/robust control — through
 understanding and experiments.
 

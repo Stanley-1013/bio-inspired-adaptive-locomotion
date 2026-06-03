@@ -71,9 +71,9 @@ lives in [`../results/`](../results/).
   activation low-pass act as **implicit actuator-feasibility bounds baked into
   training**, so the learned policy stays inside a hardware-plausible torque
   envelope without an explicit constraint.
-- **What our data shows — this is SATA's strongest "control" property.** Phase 3
-  is decisive: ablating activation lets peak torque reach 42.5 N·m — at the real
-  Go2's 45 N·m limit, ~1.8× the sim's 23.5 N·m clip (p<0.001). The bio layer is
+- **What our data shows.** Phase 3 is fairly clear here: ablating activation
+  lets peak torque reach 42.5 N·m — at the real Go2's 45 N·m limit, ~1.8× the
+  sim's 23.5 N·m clip (p<0.001). The bio layer is
   functionally the **saturation / rate-limit a careful classical controller
   would impose** — learned-in rather than written analytically. The cost
   (Phase 2: +20% training reward when removed) is the price of staying feasible,
@@ -91,7 +91,7 @@ lives in [`../results/`](../results/).
   A simple stance-gated PD-on-body-height residual recovers payload stability
   with a few N·m of extra torque — but only with *gentle* gains; strong gains
   fail in *both* sign directions because the **frozen policy cannot observe the
-  residual and treats it as an unmodelled disturbance**. This is the core lesson:
+  residual and treats it as an unmodelled disturbance**. The takeaway we draw:
   a bolt-on classical layer and a learned policy are not co-designed, so the
   policy fights the correction. It is precisely the gap that **RL-with-online-
   adaptation** methods close by *learning* the adaptation jointly — e.g.
@@ -105,13 +105,13 @@ feasibility constraints**, not online adaptation or analytic guarantees:
 - Q1 unknown dynamics → fixed robust policy (works in-set, fails out-of-set: §VI-A)
 - Q2 disturbances → fatigue is effort-regularisation, *not* disturbance compensation (analogy down-graded by our data)
 - Q3 envelope → growth is a *training* curriculum, *not* runtime gain scheduling (analogy corrected)
-- Q4 feasibility → Hill/activation are *learned-in* saturation/rate limits (SATA's strongest control-theoretic property; our Phase 3 evidence)
+- Q4 feasibility → Hill/activation read as *learned-in* saturation/rate limits — the property our Phase 3 data speaks to most directly
 - Q5 output → neural law; a bolt-on classical residual only partly helps because it isn't co-designed (motivates RL+online-adaptation, e.g. RL2AC)
 
-Two of the README's original first-draft analogies (fatigue↔disturbance
-compensation, growth↔gain scheduling) **do not survive contact with the data** and
-are corrected above — which is itself a result of taking the control lens
-seriously rather than decoratively.
+Two of the README's own first-draft analogies (fatigue↔disturbance
+compensation, growth↔gain scheduling) seem to us not well supported by the data,
+and we have revised them above — which is what we hoped taking the control lens
+seriously would surface.
 
 **Caveat (carried from Phase 3):** the feasibility argument is inferred from sim
 torque/energy vs the Go2 datasheet; there is no real-robot or thermal-model

@@ -49,7 +49,7 @@ velocity impulse every 2–4 s). In-spec payloads are 5 and 8 kg; 10/15 kg are
 *beyond rated capacity* and are reported only to characterise *how* each
 policy degrades, not as robustness evidence.
 
-## Result 1 — nominal feasibility (the core finding)
+## Result 1 — nominal feasibility (the main thing we observed)
 
 At nominal walking (no perturbation), mean ± std over 8 seeds. Significance is
 Welch's t-test of each ablation against the reference (8 v 8):
@@ -66,8 +66,8 @@ Welch's t-test of each ablation against the reference (8 v 8):
 
 ![nominal feasibility](./plots/nominal_feasibility.png)
 
-The two ablations that scored *higher* training reward in Phase 2 each breach
-the hardware-realisable envelope — but via **different** mechanisms, which the
+The two ablations that scored *higher* training reward in Phase 2 each also
+leave the hardware-realisable envelope — but via **different** mechanisms, which the
 statistics make precise:
 
 - **`no_activation` breaches on peak torque only.** It peaks at 42.5 ± 4.4 N·m
@@ -158,9 +158,9 @@ push_x_1p5 was added for this reason.)
 
 | Mechanism | SATA's claim | Our measurement (8v8, nominal unless noted) | Verdict |
 |---|---|---|---|
-| Activation low-pass | "improve motion continuity" | action jerk is *lower* without it (351 vs 782, p<0.001) → PPO is already smooth; the real effect is peak torque 22→42 N·m (p<0.001) | the *smoothing* rationale is not supported in-distribution; the layer's actual function is **bounding peak torque** to a hardware-feasible range |
+| Activation low-pass | "improve motion continuity" | action jerk is *lower* without it (351 vs 782, p<0.001) → PPO is already smooth; the real effect is peak torque 22→42 N·m (p<0.001) | the *smoothing* rationale is not supported in our in-distribution data; the effect we can measure is **bounding peak torque** to a hardware-feasible range |
 | Hill model | "limit torque to safe range, suppress rapid/extreme torque" | no_hill peak torque is *lower* (19.5 vs 22.5, p<0.001, capped at clip) not higher; energy & jerk n.s.; ≈ reference under push too | **not detected** on our axes (steady command / impulse / static payload); force-velocity shaping likely matters in high-joint-velocity regimes we did not isolate — "not detected ≠ useless" |
-| Motor fatigue | "prevent prolonged high loads" | without it: 2.5× energy (p<0.001), 35× jerk (p<0.001), and it sustains the high torque that lets it hold payload reference refuses to | **strongly supported** — the dominant feasibility constraint of the three; its §VI-A "limitation" is thermal-overload refusal working as designed |
+| Motor fatigue | "prevent prolonged high loads" | without it: 2.5× energy (p<0.001), 35× jerk (p<0.001), and it sustains the high torque that lets it hold payload reference refuses to | **well supported on our axes** — the clearest of the three feasibility constraints in our data; consistent with reading the §VI-A "limitation" as thermal-overload refusal (sim-inferred; no thermal model — see caveats) |
 | Growth curriculum | "deeper exploration, fewer shortcuts" | deployed policy indistinguishable from reference on every metric (all n.s.) | a *training-process* knob; no footprint in deployed behaviour (consistent with Phase 2 n.s. on reward) — our deployed-policy eval cannot see training dynamics |
 
 ## Synthesis
