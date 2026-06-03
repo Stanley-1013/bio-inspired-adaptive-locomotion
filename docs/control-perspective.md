@@ -19,12 +19,15 @@ lives in [`../results/`](../results/).
   (here, body mass) *online* and adjust the control law so tracking is
   maintained as the parameter drifts.
 - **SATA's answer:** train one *fixed* policy that is *robust over a
-  distribution* of masses (domain randomisation `added_mass ∈ [−1, +5] kg`).
+  distribution* of masses (the SATA config's domain randomisation is
+  `added_mass ∈ [−1, +5] kg`; the paper §IV-B states it as "up to 5 kg").
   No online estimation — a single set of weights expected to cover the set.
 - **What our data shows.** This is the crisp robust-vs-adaptive distinction.
-  The reference holds in-distribution payloads but **falls at 8 kg and beyond**
-  (Phase 3: episode length 3467→2994→2641 across 5/8/10 kg; reproduces SATA
-  §VI-A). A fixed robust policy works *inside* the set it was trained on and
+  By our fall / episode-length metric the reference holds in-distribution
+  payloads and **degrades from 8 kg and beyond** (Phase 3: episode length
+  3467→2994→2641 across 5/8/10 kg). This is consistent with — but measured
+  differently from — SATA §VI-A, whose stated onset is a *body-height* failure
+  already at 5 kg (calves contacting the ground), not necessarily a fall. A fixed robust policy works *inside* the set it was trained on and
   has no mechanism to extend beyond it — exactly the property online adaptive
   control adds. SATA answers Q1 with **robustness, not adaptation**; the §VI-A
   limitation is the signature of that choice, not a bug.

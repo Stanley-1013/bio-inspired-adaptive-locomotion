@@ -469,14 +469,14 @@ td .mono{font-weight:500}
           <thead><tr><th>8 kg payload</th><th>reward</th><th>Δ vs ref</th><th>p</th></tr></thead>
           <tbody>
             <tr><td>reference</td><td class="mono">60.5</td><td>—</td><td></td></tr>
-            <tr><td class="win">+ residual</td><td class="mono win">82.7</td><td class="win mono">+37%</td><td class="sig">0.045</td></tr>
+            <tr><td class="win">+ residual</td><td class="mono win">82.7</td><td class="win mono">+37%</td><td class="sig">0.07 n.s.</td></tr>
             <tr><td style="color:var(--ink-soft)">no_fatigue</td><td class="mono" style="color:var(--ink-soft)">154.6</td><td style="color:var(--ink-soft)" class="mono">(ablation)</td><td></td></tr>
           </tbody>
         </table>
         <div class="callout rise r4">
-          A small, <strong>borderline-significant</strong> recovery — and only ~¼ of
-          the way to the ablation. The frozen policy <em>treats the residual as a
-          disturbance</em>; that ceiling motivates <span class="teal">co-trained
+          A small <strong>positive trend</strong> (two-sided Welch p≈0.07, not
+          significant) — and only ~¼ of the way to the ablation. The frozen policy
+          <em>treats the residual as a disturbance</em>; that ceiling motivates <span class="teal">co-trained
           RL + adaptation</span> (RL2AC).
         </div>
       </div>
@@ -522,7 +522,7 @@ td .mono{font-weight:500}
         </ul>
         <ul class="bul rise r3">
           <li class="t">The ceiling on the bolt-on motivates <strong>co-designed RL + adaptation</strong>.</li>
-          <li><strong>Limits kept in view:</strong> simulation only · no thermal model · residual gains tuned on one seed · borderline p-values reported as suggestive.</li>
+          <li><strong>Limits kept in view:</strong> simulation only · no thermal model · residual gains tuned on one seed · the residual's payload gain is a non-significant trend (p≈0.07).</li>
         </ul>
       </div>
       <div class="pills rise r4" style="margin-top:26px">

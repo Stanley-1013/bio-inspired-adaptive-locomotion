@@ -105,9 +105,10 @@ compensation** term in boundary cases.
   [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
 - **Phase 4 (Residual compensation) — done (2026-05-29).** A simple stance-gated
   classical height-PD residual `τ_total = τ_SATA + τ_comp`, bolted onto the
-  frozen reference policy, gives a small, borderline-significant payload-reward
-  recovery (8 kg: +37 %, p=0.045) **within the actuator envelope and harmless at
-  nominal** — but only ~1/4 of the way to the no_fatigue ablation, because the
+  frozen reference policy, gives a small payload-reward recovery (8 kg: +37 %, a
+  positive but not-significant trend, two-sided Welch p≈0.07) **within the
+  actuator envelope and harmless at nominal** — but only ~1/4 of the way to the
+  no_fatigue ablation, because the
   frozen policy treats the residual as a disturbance. Motivates co-trained
   RL+adaptation (RL2AC). [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
 - **Synthesis — the control-theoretic reading** (delivers this project's

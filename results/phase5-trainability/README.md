@@ -17,7 +17,9 @@ kept on (config in
 | | mean reward (n=5) | std |
 |---|---:|---:|
 | reference | 103.9 | 15.9 |
-| `no_biomech` | 138.6 | 4.2 |
+| `no_biomech` | 138.6 | 4.7 |
+
+(std is sample std, ddof=1, to match the reference convention.)
 
 The resulting policy walks and tracks the velocity command; posture and contact
 pattern are close to the reference:
@@ -30,10 +32,11 @@ Two things make this **not** a clean comparison against the paper's result, so
 we are recording it as an observation rather than a claim either way:
 
 1. **Our knobs degenerate the pipeline to scaled raw torque.** With all three
-   flags off, `_compute_torques` reduces to `torques = actions · action_scale`
-   (the `tanh·τ_limit` activation envelope and the Hill term cancel). That is a
-   specific, benign re-parameterisation — not necessarily the same baseline the
-   paper used. The paper does not give equations or code for its "w/o
+   flags off, `_compute_torques` reduces to `torques ≈ actions · action_scale`
+   (the `tanh·τ_limit` activation envelope and the Hill term cancel; the only
+   residual is the 10% per-step action-hold from `loss_rate`, which we leave on
+   as domain randomisation). That is a specific, benign re-parameterisation —
+   not necessarily the same baseline the paper used. The paper does not give equations or code for its "w/o
    biomechanical model" variant, and the public repo
    ([marmotlab/SATA](https://github.com/marmotlab/SATA)) ships only the full
    model, so the two cannot be lined up exactly.
