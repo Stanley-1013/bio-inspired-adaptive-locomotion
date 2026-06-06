@@ -1,11 +1,14 @@
 # Phase 5 — A trainability side note
 
-**Status: a small follow-up, not a headline.** While re-reading the SATA paper
+**Status: a small follow-up, not a headline, and not a comparison against the
+paper's claim.** While re-reading the SATA paper
 ([arXiv:2502.12674](https://arxiv.org/abs/2502.12674), §V-A1), we noticed its
-ablation framing is about *trainability* — the paper reports that "SATA w/o
-biomechanical model" is "completely unable to learn a coherent gait." Our
-Phase 2 ablations had only ever removed one biomechanical knob at a time, so we
-ran the all-three-off case once to see what it looks like in this codebase.
+ablation framing is about *gait-quality trainability* — the paper reports that
+"SATA w/o biomechanical model" is "completely unable to learn a coherent gait,
+instead learning to shift its feet on the floor asymmetrically." Our Phase 2
+ablations had only ever removed one biomechanical knob at a time, so out of
+curiosity we ran the all-three-off case once. We did not build the gait-quality
+measurement the paper's claim would need, so this stays a side observation.
 
 ## What we ran
 
@@ -14,21 +17,21 @@ kept on (config in
 [`../phase2-ablation/configs/go2_torque_ablations.py`](../phase2-ablation/configs/go2_torque_ablations.py)),
 5 seeds, same 3000 iters / 4096 envs as the reference.
 
-| | mean reward (n=5) | std |
-|---|---:|---:|
-| reference | 103.9 | 15.9 |
-| `no_biomech` | 138.6 | 4.7 |
+**Important framing first.** The paper's claim concerns *gait quality* — a no-bio
+policy "learning to shift its feet on the floor asymmetrically" rather than
+walking. We did **not** evaluate gait quality here (no quantitative gait metric,
+no comparison of foot-shuffle vs. true walking). So our scalar training reward is
+**not comparable** to the paper's claim, and we draw **no inference** about it
+either way. What we can report is narrow: with our all-off knobs the run trains to
+a similar-or-higher *scalar reward* (n=5: 138.6 ± 4.7 vs. reference 103.9 ± 15.9,
+sample std) rather than collapsing. Reward is not gait quality, and a degenerate
+foot-shuffle can still score reward — so this number says nothing about whether
+the gait is coherent.
 
-(std is sample std, ddof=1, to match the reference convention.)
+A clip of one seed is included for completeness; we make no claim about its gait
+quality from it:
 
-The higher reward here is **not** a refutation of the paper — our all-off knobs
-are a different baseline (scaled raw torque), and reward is not gait quality.
-See "Why we did not push this further" below.
-
-The resulting policy walks and tracks the velocity command; posture and contact
-pattern are close to the reference:
-
-![no_biomech walking](./videos/no_biomech_walk_s1.gif)
+![no_biomech, one seed](./videos/no_biomech_walk_s1.gif)
 
 ## Why we did not push this further
 

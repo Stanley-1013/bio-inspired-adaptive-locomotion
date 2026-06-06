@@ -15,12 +15,16 @@ Phase 1/2) evaluated under 8 controlled scenarios — 384 evaluation cells,
 ## Why this phase exists
 
 Phase 2 found that removing the fatigue or activation constraint *raises*
-training reward. Taken alone that reading is misleading: SATA's bio-inspired
-mechanisms are not reward devices, they are **feasibility / safety constraints
-meant to keep a sim-trained policy inside what real hardware can do**
-(bounded torque, smooth actuation, no sustained thermal overload). This phase
-asks the question Phase 2 cannot: *what do those constraints actually buy,
-measured on axes other than training reward?*
+training reward. Taken alone that reading is misleading. The paper frames
+these mechanisms around **both** early-stage exploration / trainability *and*
+smoothness / feasibility (§III-A) — and this eval can only probe the second.
+So *our working interpretation, on the axes we can measure here*, is that the
+bio mechanisms behave less like reward devices and more like **feasibility /
+safety constraints that keep a sim-trained policy inside what real hardware
+can do** (bounded torque, smooth actuation, no sustained thermal overload).
+That is a hypothesis about the measured axis, not the paper's stated design
+intent. This phase asks the question Phase 2 cannot: *what do those constraints
+actually buy, measured on axes other than training reward?*
 
 - **H1 (constraint = feasibility envelope):** the ablated policies win reward
   by operating in regimes a real Unitree Go2 could not sustain (torque beyond
@@ -176,7 +180,9 @@ charge for hardware-infeasible behaviour that the constraint otherwise
 forbids. Hill model and growth show no footprint on these particular axes —
 their value, if any, lies elsewhere (Hill possibly under disturbance regimes
 we did not isolate; growth in training dynamics, which a deployed-policy eval
-cannot see).
+cannot see). Note our deployed eval tested payload / push, not OOD velocity
+commands — where the paper's growth-generalization claim (§V-A1, Fig 5b, tested
+at 1.8 m/s) actually lives — so we cannot speak to that claim either way.
 
 ## Caveats (important — this is a reproduction, not a hardware study)
 

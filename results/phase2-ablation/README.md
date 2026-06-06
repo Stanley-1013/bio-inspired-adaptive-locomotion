@@ -64,14 +64,16 @@ bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_
 ## Results (8 seeds per condition)
 
 > **Read this first — what these numbers are and are not.** The metric below is
-> *training-distribution scalar reward*. The SATA bio-inspired mechanisms are
-> designed primarily as **feasibility / safety constraints for sim-to-real
-> transfer** (bounded actuator torque, smooth activation, fatigue-based thermal
-> protection), not as devices to raise training reward. A constraint that
-> serves sim-to-real will, by construction, often *cost* a little training
-> reward in a clean simulator — so "ablating it raises reward" is the
-> *expected* sign of a working constraint, not evidence the mechanism is
-> useless. The more informative evaluation of these mechanisms is the out-of-distribution
+> *training-distribution scalar reward*. The paper motivates the SATA
+> bio-inspired mechanisms around **both** early-stage exploration / trainability
+> *and* motion smoothness / sim-to-real feasibility (§III-A) — bounded actuator
+> torque, smooth activation, fatigue-based thermal protection. On the
+> training-reward axis measured here, only the *feasibility* face is visible:
+> a constraint that serves sim-to-real will, by construction, often *cost* a
+> little training reward in a clean simulator — which is why "ablating it raises
+> reward" is the *expected* sign of a working constraint, not evidence the
+> mechanism is useless. (The exploration / trainability face the paper leads
+> with does not show up on this scalar-reward axis.) The more informative evaluation of these mechanisms is the out-of-distribution
 > / feasibility analysis in [`../phase3-bio-claims-and-robustness/`](../phase3-bio-claims-and-robustness/),
 > not this table. Treat the numbers here as *characterising the cost of each
 > constraint in-distribution*, and read them alongside that caveat.

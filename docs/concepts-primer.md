@@ -60,7 +60,7 @@ SATA's Go2 task uses a 60-dimensional observation, including:
 - 重力方向投影 / projected gravity direction
 - 速度命令 / commanded velocity
 - 關節角與關節速度 / joint positions and velocities
-- 上一步 action / previous action
+- 施加的關節力矩 (τ) / applied joint torques (τ)
 - 每個關節的 fatigue state / per-joint fatigue state
 
 ### Action

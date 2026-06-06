@@ -15,8 +15,9 @@ whole thing through adaptive/robust control's questions. Headline: on *training
 reward* alone, removing the fatigue or activation constraint slightly *raises*
 reward, but Phase 3 shows those ablations only "win" by leaving the
 hardware-realisable torque envelope (`no_activation` peaks at 42.5 N·m vs the
-real Go2's 45 N·m limit). The bio mechanisms are **sim-to-real feasibility
-constraints, not reward devices**. Start here:
+real Go2's 45 N·m limit). On the actuator-feasibility axis we measured, the bio
+mechanisms behave more like **sim-to-real feasibility constraints than reward
+devices**. Start here:
 [`docs/sata-overview.md`](./docs/sata-overview.md) (what SATA contributes) ·
 [`docs/control-perspective.md`](./docs/control-perspective.md) (the synthesis) ·
 [results phases 1–4](./results/) · [`docs/setup-sata.md`](./docs/setup-sata.md).

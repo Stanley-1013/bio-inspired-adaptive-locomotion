@@ -5,8 +5,7 @@ Adaptive Torque-based locomotion, Li et al., MARMot Lab @ NUS, RSS 2025;
 [arXiv:2502.12674](https://arxiv.org/abs/2502.12674)) actually proposes, why its
 ideas are elegant, and what it honestly does not yet solve. Every section ends
 with **→ in this repo**, pointing to where our experiments verify, deepen, or
-probe that idea — so the rest of the repo reads as "understand & validate the
-contribution", not "poke holes in it".
+probe that idea.
 
 Companion docs: [`training-internals.md`](./training-internals.md) (the code-level
 mechanism), [`control-perspective.md`](./control-perspective.md) (a control-theoretic
@@ -44,8 +43,9 @@ stays in a biologically/physically plausible range.
 **→ in this repo:** [Phase 3](../results/phase3-bio-claims-and-robustness/)
 measures exactly this. Ablating the activation layer lets peak torque jump to
 **42.5 N·m** — right at the real Go2's 45 N·m actuator limit (~1.8× the sim's own
-23.5 N·m clip). So on the axis we measured, the layer's main effect is to keep
-the policy inside a hardware-realisable torque envelope. The biomechanical model
+23.5 N·m clip). So on the actuator-feasibility axis we measured, the dominant
+effect we observed is to keep the policy inside a hardware-realisable torque
+envelope. The biomechanical model
 looks, in control terms, like a **learned-in saturation/rate limit** (see
 control-perspective Q4).
 
