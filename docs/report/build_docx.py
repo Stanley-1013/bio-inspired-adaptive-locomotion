@@ -152,24 +152,29 @@ def main():
         insert_spine(doc)
 
     # --- 封面(置中,標楷體,字級對齊範例)---
+    # 不把 markdown 空行轉成空段落(會把封面撐到第二頁);改用段前/段後間距控制行距。
+    cover_top = Pt(28)   # 第一行上方留白(取代以往用空段落墊高)
+    first_cover = True
     for l in lines[:first_hr]:
         t = l.strip()
         if not t:
-            doc.add_paragraph(); continue
+            continue   # 跳過空行,不產生空段落
         if t.startswith('力矩控制') or t.startswith('Reproducing'):
-            size = 16
+            size = 15
         elif t.startswith('National Taiwan') or t.startswith('人工智慧實作') or t.startswith('Artificial'):
-            size = 16
+            size = 15
         elif t.startswith('李傳漢') or t.startswith('Li Chuan') or t.startswith('指導教授') or '2026' in t or '一一五' in t:
-            size = 18
-        else:
             size = 14
-        para(doc, t, size=size, bold=False, align=WD_ALIGN_PARAGRAPH.CENTER)
-    # 封面後分節(分頁但不留空白段)
-    doc.paragraphs[-1].add_run().add_break(6) if False else None
-    pb = doc.add_paragraph(); pb.add_run().add_break()
-    from docx.enum.text import WD_BREAK
-    pb.runs[0].add_break(WD_BREAK.PAGE)
+        else:
+            size = 13
+        p = para(doc, t, size=size, bold=False, align=WD_ALIGN_PARAGRAPH.CENTER)
+        pf = p.paragraph_format
+        pf.space_after = Pt(10)
+        pf.space_before = cover_top if first_cover else Pt(2)
+        first_cover = False
+    # 封面後分頁(用段落屬性 page-break-before,不額外產生空段)
+    nxt = doc.add_paragraph()
+    nxt.paragraph_format.page_break_before = True
 
     i = first_hr + 1
     fig_re = re.compile(r'^>?\s*[【\[]\s*(?:此處插圖|Figure)\s*(\d+)\s*(?:here)?\s*[】\]]\s*(.*)$')
