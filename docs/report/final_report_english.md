@@ -6,7 +6,7 @@ National Taiwan University
 
 Artificial Intelligence Implementation Final Report
 
-Reproducing and Migrating Bio-Inspired Torque-Based Quadruped Locomotion Control across Simulators
+Reinforcement Learning for Bio-Inspired Torque-Based Quadruped Locomotion: A Cross-Simulator Reproduction and Analysis
 
 Li Chuan-Han
 
@@ -32,13 +32,13 @@ June, 2026
 
 ## Abstract
 
-Reinforcement learning controllers for quadruped robots predominantly rely on **position control**: the policy network outputs target joint angles, which a low-level proportional-derivative (PD) controller then converts into joint torques. Position control is easy to train but produces stiff behavior with insufficient compliance, and it tends to overreact when confronted with unforeseen disturbances. **Torque control** commands joint torques directly and is a more compliant alternative, but its action space is highly nonlinear, exploration is inefficient in early training, and it has long been regarded as difficult to train. This report centers on **SATA** (Safe and Adaptive Torque-Based Locomotion, arXiv:2502.12674), proposed by Li et al. in 2025 at the marmotlab of the National University of Singapore. We fully reproduce its torque control pipeline on the Unitree Go2 quadruped and analyze it through the lens of questions raised by adaptive and robust control.
+This report is a **deep reinforcement learning** project: it trains and analyzes a quadruped locomotion controller using neural-network policies, the PPO algorithm, and ablation studies. Reinforcement learning controllers for quadruped robots predominantly rely on **position control**: the policy network outputs target joint angles, which a low-level proportional-derivative (PD) controller then converts into joint torques. Position control is easy to train but produces stiff behavior with insufficient compliance, and it tends to overreact when confronted with unforeseen disturbances. **Torque control** commands joint torques directly and is a more compliant alternative, but its action space is highly nonlinear, exploration is inefficient in early training, and it has long been regarded as difficult to train. This report centers on **SATA** (Safe and Adaptive Torque-Based Locomotion, arXiv:2502.12674), proposed by Li et al. in 2025 at the marmotlab of the National University of Singapore. We fully reproduce its torque control pipeline on the Unitree Go2 quadruped and analyze it through the lens of questions raised by adaptive and robust control.
 
 The implementation in this study spans two stages. In the **first stage**, we reproduce SATA on the Isaac Gym simulator and conduct a systematic four-phase analysis: reproducing the reference policy (eight random seeds), ablating each of the three bio-inspired mechanisms one at a time, evaluating the hardware feasibility of all forty-eight policies under payload and external-force disturbances, and testing a classical residual compensation term. In the **second stage**, we migrate the entire pipeline to NVIDIA's next-generation engine, Isaac Lab, and compare cross-engine fidelity item by item while holding the robot (Go2) fixed as the control variable.
 
 This report emphasizes **hands-on implementation**: all results were trained, evaluated, and reproduced by us, rather than merely cited from the paper. Both projects are open-sourced (links at the end), and anyone may use, inspect, or build upon them under their respective licenses. We maintain statistical rigor throughout the analysis (at least five seeds per condition, reporting means and sample standard deviations, and using Welch's t-test), and where a phenomenon cannot be confirmed, we honestly leave it as an open question rather than overclaiming.
 
-**Keywords**: Torque Control, Bio-Inspired Locomotion, Reinforcement Learning, Quadruped, Cross-Engine Reproduction, Isaac Gym, Isaac Lab
+**Keywords**: Deep Reinforcement Learning, Neural Network Policy, PPO, Torque Control, Bio-Inspired Locomotion, Quadruped, Cross-Engine Reproduction
 
 ---
 
