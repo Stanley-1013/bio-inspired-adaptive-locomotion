@@ -20,11 +20,12 @@ June, 2026
 
 - Abstract
 - Chapter 1. Introduction
-- Chapter 2. Core Technology: Torque Control and the Bio-Inspired Locomotion Layer
-- Chapter 3. Practical Implementation I: Reproducing and Analyzing SATA on Isaac Gym
-- Chapter 4. Practical Implementation II: Cross-Engine Migration to Isaac Lab
-- Chapter 5. Results and Methodological Rigor
-- Chapter 6. Conclusion and Reflection
+- Chapter 2. Method: Reinforcement Learning and PPO
+- Chapter 3. Core Technology: Torque Control and the Bio-Inspired Locomotion Layer
+- Chapter 4. Practical Implementation I: Reproducing and Analyzing SATA on Isaac Gym
+- Chapter 5. Practical Implementation II: Cross-Engine Migration to Isaac Lab
+- Chapter 6. Results and Methodological Rigor
+- Chapter 7. Conclusion and Reflection
 - References
 - Open Source
 
@@ -66,7 +67,74 @@ The value of this study lies in **hands-on implementation and honest analysis**,
 
 ---
 
-## Chapter 2. Core Technology: Torque Control and the Bio-Inspired Locomotion Layer
+## Chapter 2. Method: Reinforcement Learning and PPO
+
+The core method of this project is **reinforcement learning (RL)** -- more precisely, training a neural-network policy with **Proximal Policy Optimization (PPO)**. This chapter explains the RL problem formulation, how PPO works, and the network, observation, action, reward, and hyperparameter settings actually used in this study.
+
+### 2.1 The Reinforcement Learning Problem
+
+Quadruped locomotion control can be cast as a **Markov Decision Process (MDP)**: at each time step the agent (the robot policy) observes the current **state**, outputs an **action**, the environment transitions to the next state and returns a **reward**. The learning objective is to find a **policy** $\pi$ -- a function mapping states to actions -- that maximizes the expected long-term discounted reward.
+
+We use RL rather than a hand-designed control law because the dynamics of a quadruped on rough terrain are highly nonlinear and hard to model analytically; RL lets the policy **learn directly from large amounts of interaction with the simulated environment**, without writing down control equations in advance. In this project the state is the robot's proprioception (velocities, orientation, joint states, etc.), the action is the torque command for the twelve joints, and the reward encourages tracking velocity commands while maintaining body height and posture (see 2.4).
+
+### 2.2 The PPO Algorithm
+
+PPO is one of the most widely used **policy-gradient** algorithms for continuous control and adopts an **actor-critic** architecture:
+
+- The **actor (policy network)** outputs a probability distribution over actions (here a diagonal Gaussian whose mean is produced by the network and whose standard deviation is a learnable parameter);
+- The **critic (value network)** estimates the value of a state, which is used to compute the **advantage** -- how much better a given action is than average. We compute advantages with **Generalized Advantage Estimation (GAE, $\lambda=0.95$, $\gamma=0.99$)**.
+
+PPO's key innovation is the **clipped surrogate objective**: it limits how far the new-to-old policy probability ratio may deviate from 1 (clip range $\epsilon=0.2$) on each update, preventing a single update from being so large that it destroys the learned policy. The loss is
+
+```
+L = clipped_surrogate(ε=0.2) + value_loss_coef × value_loss − entropy_coef × entropy
+```
+
+where the entropy term (coefficient 0.01) encourages exploration and avoids premature convergence. We also use an **adaptive learning rate**: based on the measured KL divergence each iteration compared with a target (desired_kl = 0.01), the learning rate is doubled or halved to keep updates within a stable range.
+
+> Why PPO: it strikes a good balance between sample efficiency and stability under massively parallel simulation, and it is the algorithm used by the original SATA work -- reproducing with the same algorithm lets us attribute any differences to the environment or design rather than to the algorithm itself.
+
+### 2.3 Network Architecture and Training Scale
+
+- **Network**: both actor and critic are three-layer multilayer perceptrons (MLPs) with hidden layers `[512, 256, 128]` and ELU activations; both share the same 60-dimensional observation (no privileged information). The actor outputs a 12-dimensional Gaussian action (initial standard deviation 1.0). About 400k parameters in total.
+- **Training scale**: 4096 parallel environments; each iteration collects 24 steps × 4096 environments ≈ 98,000 transitions; each iteration performs 5 epochs × 4 mini-batches = 20 gradient updates. Trained for 3000 iterations, roughly 295 million environment steps. Other hyperparameters: value-loss coefficient 1.0, gradient-norm clip 1.0.
+
+### 2.4 Observation, Action, and Reward Design
+
+**Observation (60-dim)** -- the robot's proprioception, concatenated as follows:
+
+| Index | Content |
+|---|---|
+| 0:3 | Base linear velocity (body frame) |
+| 3:6 | Base angular velocity |
+| 6:9 | Projected gravity vector (tilt sensing) |
+| 9:21 | Joint angle − default angle (12 DOF) |
+| 21:33 | Joint angular velocity (12 DOF) |
+| 33:36 | Velocity command $(v_x, v_y, \omega_{yaw})$ |
+| 36:48 | Applied joint torques (12 DOF) |
+| 48:60 | Per-DOF fatigue state (SATA-specific) |
+
+**Action (12-dim)**: torque commands for the twelve joints (applied after the bio-inspired layer of Chapter 3).
+
+**Reward function** -- nine terms (positive terms reward task achievement, negative terms penalize undesirable behavior):
+
+| Term | Weight | Role |
+|---|---:|---|
+| forward | +10 | Track forward velocity $v_x$ (exponential of error) |
+| head_height | +5 | Maintain body height and stay upright |
+| moving_y | +5 | Track lateral velocity $v_y$ |
+| moving_yaw | +5 | Track yaw rate $\omega_{yaw}$ |
+| soft_dof_pos_limits | −5 | Avoid sitting near mechanical joint limits |
+| motor_fatigue | −0.05 | Small penalty on accumulated fatigue |
+| dof_acc | −1×10⁻⁶ | Action smoothness (squared joint acceleration) |
+| roll | −5 | Avoid tipping sideways |
+| lin_vel_z | −5 | Avoid vertical bouncing |
+
+This reward design embodies a core trade-off in RL control: the positive terms define "the desired behavior" (walk correctly), while the negative terms constrain "the cost paid" (do not thrash, do not exceed limits). The ablation analysis in later chapters examines precisely how these terms interact with the bio-inspired mechanisms.
+
+---
+
+## Chapter 3. Core Technology: Torque Control and the Bio-Inspired Locomotion Layer
 
 The twelve-dimensional action output by the policy network is not directly equal to the joint torques. At each physics sub-step, the action passes through the following processing (the code resides in `_compute_torques` within `go2_torque.py` of the SATA source). The torque-limit baseline is a uniform 23.5 N·m per degree of freedom (the simulation clipping value).
 
@@ -108,7 +176,7 @@ The concept of this mechanism is "**embodiment growth**," not a curriculum of ta
 
 ---
 
-## Chapter 3. Practical Implementation I: Reproducing and Analyzing SATA on Isaac Gym
+## Chapter 4. Practical Implementation I: Reproducing and Analyzing SATA on Isaac Gym
 
 The first stage was carried out on Isaac Gym Preview 4, in four phases. All training used 4096 parallel environments, 3000 iterations, a `[512, 256, 128]` multilayer perceptron, and the PPO algorithm, executed on the lab's NVIDIA A6000 GPU.
 
@@ -170,7 +238,7 @@ The result was that it still trained successfully, and the reward was even highe
 
 ---
 
-## Chapter 4. Practical Implementation II: Cross-Engine Migration to Isaac Lab
+## Chapter 5. Practical Implementation II: Cross-Engine Migration to Isaac Lab
 
 Isaac Gym Preview 4 has been discontinued. NVIDIA's official successor is **Isaac Lab**, built on top of Isaac Sim (and reusing the same rsl_rl PPO backend). The second stage migrates the entire SATA pipeline to Isaac Lab and answers a question that is more fundamental than the first stage: **can a faithful port still hold when only the simulation engine is swapped?**
 
@@ -203,7 +271,7 @@ Decomposing the per-step reward term by term further reveals that **the gap betw
 
 ---
 
-## Chapter 5. Results and Methodological Rigor
+## Chapter 6. Results and Methodological Rigor
 
 The credibility of this study rests on a series of deliberate methodological choices:
 
@@ -218,7 +286,7 @@ We also used data to **correct two analogies from our own first draft**: fatigue
 
 ---
 
-## Chapter 6. Conclusion and Reflection
+## Chapter 7. Conclusion and Reflection
 
 This study fully reproduced SATA's torque-based quadruped locomotion and carried out the training, evaluation, and analysis by hand on two simulation engines. Our observations can be summarized as follows: along the hardware-feasibility axis we measured, the bio-inspired mechanisms behave more like **sim-to-real feasibility constraints** than mere reward-tuning devices -- disabling them does raise the reward in clean simulation, but at the cost of leaving the hardware-feasible range. A classical residual compensation term can recover part of the load capacity within the feasible range, but only to a limited degree; its ceiling stems from the lack of co-design, pointing toward co-trained reinforcement-learning and adaptive methods. As for cross-engine migration, the faithful port reproduced SATA's per-step task performance after the engine was swapped, with the remaining gap concentrated in the definitional difference of a single penalty term.
 
