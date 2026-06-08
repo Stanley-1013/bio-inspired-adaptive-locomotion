@@ -4,8 +4,6 @@ College of Bioresources and Agriculture
 
 National Taiwan University
 
-Artificial Intelligence Implementation Final Report
-
 Reinforcement Learning for Bio-Inspired Torque-Based Quadruped Locomotion: A Cross-Simulator Reproduction and Analysis
 
 Li Chuan-Han

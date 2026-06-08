@@ -98,14 +98,29 @@ def add_table(doc, rows):
             r = cell.paragraphs[0].add_run(row[j] if j < len(row) else '')
             set_font(r, size=10, bold=(i == 0))
 
-def insert_spine(doc):
-    """把直書書脊文字方塊注入封面第一段。"""
+def insert_spine(doc, mode='zh'):
+    """把直書書脊文字方塊注入封面第一段。mode='zh' 中文書脊 / 'en' 英文書脊。"""
     if not os.path.isfile(SPINE_TPL):
         print("  (警告:找不到 spine_template.xml,略過書脊)"); return None
     xml = open(SPINE_TPL, encoding='utf-8').read()
-    # 替換範例文字 → 本報告。範例書脊:「人工智慧實作期末報告  MCP 介紹及實作  趙華杉  撰」
-    xml = xml.replace('  MCP ', '  ').replace('介紹及實作', SPINE['title'])
-    xml = xml.replace('趙華杉', SPINE['author'])
+    if mode == 'en':
+        # 英文書脊:校系名 + 課程 + 標題 + 作者(全英文)
+        # 系名被拆成多個 run(生物機電工程學系( / 所 / 、 / 學位學程 / )),逐一處理
+        xml = xml.replace('國立臺灣大學', 'National Taiwan University ')
+        xml = xml.replace('生物機電工程學系(', 'Department of Biomechatronics Engineering')
+        xml = xml.replace('學位學程', '')
+        xml = xml.replace('人工智慧實作期末報告', SPINE.get('course_en', 'Final Report'))
+        xml = xml.replace('  MCP ', '  ').replace('介紹及實作', SPINE['title'])
+        xml = xml.replace('趙華杉', SPINE['author'])
+        xml = xml.replace('撰', '')
+        # 清掉系名殘餘的單字中文碎片(所、、、))——只在英文書脊
+        for frag in ['所', '、', '）', '(', ')']:
+            xml = xml.replace(f'<w:t>{frag}</w:t>', '<w:t></w:t>')
+            xml = xml.replace(f'<w:t xml:space="preserve">{frag}</w:t>', '<w:t xml:space="preserve"></w:t>')
+    else:
+        # 中文書脊:替換範例文字。範例:「人工智慧實作期末報告  MCP 介紹及實作  趙華杉  撰」
+        xml = xml.replace('  MCP ', '  ').replace('介紹及實作', SPINE['title'])
+        xml = xml.replace('趙華杉', SPINE['author'])
     # 命名空間:解析時需補齊 root nsmap → 包一層帶完整宣告的 run
     NS = ('xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" '
           'xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
@@ -129,10 +144,17 @@ def insert_spine(doc):
 
 def main():
     src, out = sys.argv[1], sys.argv[2]
-    # CLI 覆寫書脊
-    if '--spine' in sys.argv:
-        i = sys.argv.index('--spine')
-        SPINE.update(title=sys.argv[i+1], author=sys.argv[i+2], year=sys.argv[i+3], month=sys.argv[i+4])
+    # --spine-mode {zh,en,none};未指定則自動:有中文封面→zh,否則 none
+    spine_mode = None
+    if '--spine-mode' in sys.argv:
+        spine_mode = sys.argv[sys.argv.index('--spine-mode') + 1]
+    # --spine-title / --spine-course-en 覆寫書脊文字
+    if '--spine-title' in sys.argv:
+        SPINE['title'] = sys.argv[sys.argv.index('--spine-title') + 1]
+    if '--spine-course-en' in sys.argv:
+        SPINE['course_en'] = sys.argv[sys.argv.index('--spine-course-en') + 1]
+    if '--spine-author' in sys.argv:
+        SPINE['author'] = sys.argv[sys.argv.index('--spine-author') + 1]
 
     md = open(src, encoding='utf-8').read()
     lines = md.split('\n')
@@ -143,13 +165,14 @@ def main():
 
     first_hr = next(i for i, l in enumerate(lines) if l.strip() == '---')
 
-    # 是否中文版(有中文封面字 → 注入書脊;英文版不注入)
     cover_txt = '\n'.join(lines[:first_hr])
     is_zh = any('一' <= c <= '鿿' for c in cover_txt)
+    if spine_mode is None:
+        spine_mode = 'zh' if is_zh else 'none'
 
-    # --- 書脊(僅中文版)---
-    if is_zh:
-        insert_spine(doc)
+    # --- 書脊 ---
+    if spine_mode in ('zh', 'en'):
+        insert_spine(doc, mode=spine_mode)
 
     # --- 封面(置中,標楷體,字級對齊範例)---
     # 不把 markdown 空行轉成空段落(會把封面撐到第二頁);改用段前/段後間距控制行距。
