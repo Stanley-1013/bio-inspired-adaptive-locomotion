@@ -75,7 +75,7 @@ The core method of this project is **reinforcement learning (RL)** -- more preci
 
 ### 2.1 The Reinforcement Learning Problem
 
-Quadruped locomotion control can be cast as a **Markov Decision Process (MDP)**: at each time step the agent (the robot policy) observes the current **state**, outputs an **action**, the environment transitions to the next state and returns a **reward**. The learning objective is to find a **policy** $\pi$ -- a function mapping states to actions -- that maximizes the expected long-term discounted reward.
+Quadruped locomotion control can be cast as a **Markov Decision Process (MDP)**: at each time step the agent (the robot policy) observes the current **state**, outputs an **action**, the environment transitions to the next state and returns a **reward**. The learning objective is to find a **policy** π -- a function mapping states to actions -- that maximizes the expected long-term discounted reward.
 
 We use RL rather than a hand-designed control law because the dynamics of a quadruped on rough terrain are highly nonlinear and hard to model analytically; RL lets the policy **learn directly from large amounts of interaction with the simulated environment**, without writing down control equations in advance. In this project the state is the robot's proprioception (velocities, orientation, joint states, etc.), the action is the torque command for the twelve joints, and the reward encourages tracking velocity commands while maintaining body height and posture (see 2.4).
 
@@ -84,9 +84,9 @@ We use RL rather than a hand-designed control law because the dynamics of a quad
 PPO is one of the most widely used **policy-gradient** algorithms for continuous control and adopts an **actor-critic** architecture:
 
 - The **actor (policy network)** outputs a probability distribution over actions (here a diagonal Gaussian whose mean is produced by the network and whose standard deviation is a learnable parameter);
-- The **critic (value network)** estimates the value of a state, which is used to compute the **advantage** -- how much better a given action is than average. We compute advantages with **Generalized Advantage Estimation (GAE, $\lambda=0.95$, $\gamma=0.99$)**.
+- The **critic (value network)** estimates the value of a state, which is used to compute the **advantage** -- how much better a given action is than average. We compute advantages with **Generalized Advantage Estimation (GAE, λ = 0.95, γ = 0.99)**.
 
-PPO's key innovation is the **clipped surrogate objective**: it limits how far the new-to-old policy probability ratio may deviate from 1 (clip range $\epsilon=0.2$) on each update, preventing a single update from being so large that it destroys the learned policy. The loss is
+PPO's key innovation is the **clipped surrogate objective**: it limits how far the new-to-old policy probability ratio may deviate from 1 (clip range ε = 0.2) on each update, preventing a single update from being so large that it destroys the learned policy. The loss is
 
 ```
 L = clipped_surrogate(ε=0.2) + value_loss_coef × value_loss − entropy_coef × entropy
@@ -112,7 +112,7 @@ where the entropy term (coefficient 0.01) encourages exploration and avoids prem
 | 6:9 | Projected gravity vector (tilt sensing) |
 | 9:21 | Joint angle − default angle (12 DOF) |
 | 21:33 | Joint angular velocity (12 DOF) |
-| 33:36 | Velocity command $(v_x, v_y, \omega_{yaw})$ |
+| 33:36 | Velocity command (vₓ, v_y, ω_yaw) |
 | 36:48 | Applied joint torques (12 DOF) |
 | 48:60 | Per-DOF fatigue state (SATA-specific) |
 
@@ -122,10 +122,10 @@ where the entropy term (coefficient 0.01) encourages exploration and avoids prem
 
 | Term | Weight | Role |
 |---|---:|---|
-| forward | +10 | Track forward velocity $v_x$ (exponential of error) |
+| forward | +10 | Track forward velocity vₓ (exponential of error) |
 | head_height | +5 | Maintain body height and stay upright |
-| moving_y | +5 | Track lateral velocity $v_y$ |
-| moving_yaw | +5 | Track yaw rate $\omega_{yaw}$ |
+| moving_y | +5 | Track lateral velocity v_y |
+| moving_yaw | +5 | Track yaw rate ω_yaw |
 | soft_dof_pos_limits | −5 | Avoid sitting near mechanical joint limits |
 | motor_fatigue | −0.05 | Small penalty on accumulated fatigue |
 | dof_acc | −1×10⁻⁶ | Action smoothness (squared joint acceleration) |
