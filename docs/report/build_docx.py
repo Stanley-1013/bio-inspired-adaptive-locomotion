@@ -58,9 +58,11 @@ def para(doc, text, size=12, bold=False, align=None, style=None):
     runs_with_bold(p, text, size=size, bold=bold)
     return p
 
-def heading(doc, text, level):
+def heading(doc, text, level, page_break=False):
     p = doc.add_heading(level=level)       # 用內建 Heading 樣式 → 進導覽窗格/目次
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    if page_break:
+        p.paragraph_format.page_break_before = True
     r = p.add_run(text); set_font(r, size=16 if level == 1 else 13, bold=True)
     return p
 
@@ -195,11 +197,10 @@ def main():
         pf.space_after = Pt(10)
         pf.space_before = cover_top if first_cover else Pt(2)
         first_cover = False
-    # 封面後分頁(用段落屬性 page-break-before,不額外產生空段)
-    nxt = doc.add_paragraph()
-    nxt.paragraph_format.page_break_before = True
+    # 封面後分頁改由「目次」H1 的 page_break_before 處理(見下),此處不再加空段。
 
     i = first_hr + 1
+    _cover_done = True  # 標記:第一個 H1(目次)需強制分頁以離開封面頁
     fig_re = re.compile(r'^>?\s*[【\[]\s*(?:此處插圖|Figure)\s*(\d+)\s*(?:here)?\s*[】\]]\s*(.*)$')
     while i < len(lines):
         t = lines[i].strip()
@@ -209,7 +210,10 @@ def main():
         if m:
             image_block(doc, int(m.group(1)), re.sub(r'\*\*', '', m.group(2))); i += 1; continue
         if t.startswith('## '):
-            heading(doc, t[3:].strip(), 1); i += 1; continue
+            htext = t[3:].strip()
+            # 所有主區塊 H1(目次/摘要/Abstract/各章/參考文獻/開放原始碼)各自起新頁。
+            # 目次本身也分頁,藉此離開封面頁。
+            heading(doc, htext, 1, page_break=True); i += 1; continue
         if t.startswith('### '):
             heading(doc, t[4:].strip(), 2); i += 1; continue
         if t.startswith('```'):
