@@ -43,3 +43,6 @@ docs/report/一分鐘講稿.md
 # 適應控制課專用版(特定課程/教授,不開源;留本機)
 docs/report/Final_Report_Adaptive_Control.md
 docs/report/Final_Report_Adaptive_Control.docx
+
+# IEEE 版(適應控制課,帶課程標示;留本機上 Overleaf 編譯)
+docs/report/Final_Report_Adaptive_Control_IEEE.tex
