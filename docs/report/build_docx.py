@@ -176,31 +176,60 @@ def main():
     if spine_mode in ('zh', 'en'):
         insert_spine(doc, mode=spine_mode)
 
-    # --- 封面(置中,標楷體,字級對齊範例)---
-    # 不把 markdown 空行轉成空段落(會把封面撐到第二頁);改用段前/段後間距控制行距。
-    cover_top = Pt(28)   # 第一行上方留白(取代以往用空段落墊高)
-    first_cover = True
-    for l in lines[:first_hr]:
-        t = l.strip()
-        if not t:
-            continue   # 跳過空行,不產生空段落
-        if t.startswith('力矩控制') or t.startswith('Reproducing'):
-            size = 15
-        elif t.startswith('National Taiwan') or t.startswith('人工智慧實作') or t.startswith('Artificial'):
-            size = 15
-        elif t.startswith('李傳漢') or t.startswith('Li Chuan') or t.startswith('指導教授') or '2026' in t or '一一五' in t:
-            size = 14
-        else:
-            size = 13
-        p = para(doc, t, size=size, bold=False, align=WD_ALIGN_PARAGRAPH.CENTER)
+    # --- 封面:上中下三區垂直分布,填滿整頁 ---
+    # 上區=校系/課程,中區=中英標題(較大),下區=作者/學號/教授/日期。
+    # 用「區塊間的大段前間距」把三區分別推到頁面上/中/下,而非全擠頂部。
+    cover_items = [l.strip() for l in lines[:first_hr] if l.strip()]
+    def cover_role(t):
+        if t.startswith('力矩控制') or t.startswith('以強化學習') or t.startswith('Reinforcement Learning for'):
+            return 'title_zh'
+        if t.startswith('Reproducing') or ('A Cross-Simulator' in t):
+            return 'title_en'
+        if t.startswith('李傳漢') or t.startswith('Li Chuan'):
+            return 'author'
+        if t.startswith('學號') or t.startswith('Student ID'):
+            return 'id'
+        if t.startswith('指導教授') or t.startswith('Teacher'):
+            return 'advisor'
+        if '2026' in t or '一一五' in t or '中華民國' in t:
+            return 'date'
+        return 'org'   # 系/院/校/課程
+    def cover_size(role):
+        return 16 if role in ('title_zh', 'title_en') else 14
+    # 預估文字高度(含長行換行緩衝),再把剩餘空間分配到三個區塊間距,
+    # 讓不同長度的封面(繁中 13 段 vs 通用 7 段)都填到約 84% 頁高、不偏上半。
+    PAGE = 648.0; TARGET = 0.80 * PAGE          # 目標占用高度(留底部緩衝,避免長標題換行溢出)
+    text_est = 0.0
+    for t in cover_items:
+        sz = cover_size(cover_role(t))
+        text_est += sz * 1.2 + (sz * 1.2 if len(t) > 40 else 0)  # 長行 +1 行緩衝
+    text_est += 6 * len(cover_items)             # 每段 space_after
+    slack = max(0.0, TARGET - text_est)          # 可分配到三個大間距的餘裕
+    # 三個大間距按比例分:頁頂 25% / 上→中 35% / 中→下 40%,各設下限
+    gap_top   = max(30.0, slack * 0.25)
+    gap_title = max(48.0, slack * 0.35)
+    gap_auth  = max(54.0, slack * 0.40)
+    prev_role = None
+    for t in cover_items:
+        role = cover_role(t)
+        size = cover_size(role)
+        bold = role in ('title_zh', 'title_en')
+        p = para(doc, t, size=size, bold=bold, align=WD_ALIGN_PARAGRAPH.CENTER)
         pf = p.paragraph_format
-        pf.space_after = Pt(10)
-        pf.space_before = cover_top if first_cover else Pt(2)
-        first_cover = False
-    # 封面後分頁改由「目次」H1 的 page_break_before 處理(見下),此處不再加空段。
+        pf.space_after = Pt(6)
+        if prev_role is None:
+            pf.space_before = Pt(gap_top)
+        elif role.startswith('title') and not (prev_role or '').startswith('title'):
+            pf.space_before = Pt(gap_title)
+        elif role == 'author' and (prev_role or '').startswith('title'):
+            pf.space_before = Pt(gap_auth)
+        else:
+            pf.space_before = Pt(6)
+        prev_role = role
+    # 封面後分頁由「目次」H1 的 page_break_before 處理。
 
     i = first_hr + 1
-    _cover_done = True  # 標記:第一個 H1(目次)需強制分頁以離開封面頁
+    in_toc = False   # 是否在目次區(用於放鬆目次清單行距)
     fig_re = re.compile(r'^>?\s*[【\[]\s*(?:此處插圖|Figure)\s*(\d+)\s*(?:here)?\s*[】\]]\s*(.*)$')
     while i < len(lines):
         t = lines[i].strip()
@@ -212,8 +241,11 @@ def main():
         if t.startswith('## '):
             htext = t[3:].strip()
             # 所有主區塊 H1(目次/摘要/Abstract/各章/參考文獻/開放原始碼)各自起新頁。
-            # 目次本身也分頁,藉此離開封面頁。
-            heading(doc, htext, 1, page_break=True); i += 1; continue
+            hp = heading(doc, htext, 1, page_break=True)
+            in_toc = htext in ('目次', 'Contents')
+            if in_toc:
+                hp.paragraph_format.space_after = Pt(24)  # 目次標題後留較大間距
+            i += 1; continue
         if t.startswith('### '):
             heading(doc, t[4:].strip(), 2); i += 1; continue
         if t.startswith('```'):
