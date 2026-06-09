@@ -138,7 +138,7 @@ This reward design embodies a core trade-off in RL control: the positive terms d
 
 The twelve-dimensional action output by the policy network is not directly equal to the joint torques. At each physics sub-step, the action passes through the following processing (the code resides in `_compute_torques` within `go2_torque.py` of the SATA source). The torque-limit baseline is a uniform 23.5 N·m per degree of freedom (the simulation clipping value).
 
-### 2.1 The Four Stages of the Torque Processing Pipeline
+### 3.1 The Four Stages of the Torque Processing Pipeline
 
 **Stage 1: Action scaling.** The dimensionless action output by the policy is multiplied by a scaling factor (action_scale = 5), amplifying it to the torque scale.
 
@@ -160,7 +160,7 @@ fatigue = (fatigue + |torque| × dt) × 0.9
 
 Its effective time constant is roughly ten physics steps (about 50 ms at 200 Hz). The fatigue state is fed back into the observation vector, so the policy "perceives its own level of exertion" and learns to distribute load. The reward penalty on fatigue is deliberately set very small (−0.05); the goal is not to forbid exertion, but to gently nudge the policy toward low-fatigue solutions when there is no tracking cost.
 
-### 2.2 Growth Curriculum
+### 3.2 Growth Curriculum
 
 SATA drives a "development level" scalar G(t) between zero and one along a Gompertz curve:
 
@@ -180,11 +180,11 @@ The concept of this mechanism is "**embodiment growth**," not a curriculum of ta
 
 The first stage was carried out on Isaac Gym Preview 4, in four phases. All training used 4096 parallel environments, 3000 iterations, a `[512, 256, 128]` multilayer perceptron, and the PPO algorithm, executed on the lab's NVIDIA A6000 GPU.
 
-### 3.1 Phase 1: Reproduction
+### 4.1 Phase 1: Reproduction
 
 We trained the reference policy with SATA's released configuration. The initial three seeds yielded a mean reward of 114 ± 6; after extending to eight seeds, the value was 103.9 ± 15.9. The reproduction itself is an engineering exercise: along the way we resolved several environment and dependency issues (for example, Isaac Gym Preview 4 mandates Python 3.8, dependency versions must be pinned in a specific order, and there is the rental etiquette of a shared GPU). Only once reproduction holds does one earn the footing for subsequent analysis and critique.
 
-### 3.2 Phase 2: Ablation Analysis (Eight Seeds)
+### 4.2 Phase 2: Ablation Analysis (Eight Seeds)
 
 We disabled each bio-inspired mechanism one at a time (single variable), trained eight seeds each, used the in-distribution scalar training reward as the metric, and ran Welch's t-test against the reference policy (using unequal variances and the Satterthwaite degrees-of-freedom approximation, because the variances across conditions differ greatly).
 
@@ -201,7 +201,7 @@ A counterintuitive result appears here: **disabling fatigue or activation actual
 
 This phase was also a lesson in statistical rigor: the initial three-seed analysis once claimed that "only the Hill model has a clear positive contribution," but this conclusion dissolved completely under eight seeds (the apparent effect of no_hill was actually a draw from the lower tail under high variance). We therefore established the principle of not drawing conclusions from a small number of seeds.
 
-### 3.3 Phase 3: The Bio-Inspired Claim and Out-of-Distribution Robustness (Core)
+### 4.3 Phase 3: The Bio-Inspired Claim and Out-of-Distribution Robustness (Core)
 
 We evaluated all forty-eight policies (six conditions × eight seeds) under eight scenarios, for 384 evaluation cells in total. The scenarios spanned no disturbance (nominal), different payloads (5/8/10/15 kg), and different lateral external forces. The hardware baseline of the Unitree Go2 is: a body mass of about 15 kg, a rated payload of 7/8/12 kg depending on the model, and a single-joint peak torque of 45 N·m.
 
@@ -216,7 +216,7 @@ In other words, the two constraints of fatigue and activation sacrificed trainin
 
 > [Figure 4 here] A comparison under a 10 kg payload (exceeding the rated value): left is the reference policy (reproducing the paper's payload limitation, gradually collapsing); right is no-fatigue (holding up, but in a hardware-infeasible way using 2.5× energy and 35× jerk). From `02_reference_payload10.gif` and `03_no_fatigue_payload10.gif`.
 
-### 3.4 Phase 4: Residual Compensation
+### 4.4 Phase 4: Residual Compensation
 
 On the **frozen** reference policy, this study adds a classical "stance-phase-gated, height-based PD residual." Its compensation torque is defined as:
 
@@ -230,7 +230,7 @@ Results (two-tailed Welch's test of residual vs. reference, eight seeds): under 
 
 > [Figure 5 here] The reward and peak torque of the residual compensation under each payload (from `residual_payload.png`).
 
-### 3.5 Incidental Observation: Trainability (Left as an Open Question)
+### 4.5 Incidental Observation: Trainability (Left as an Open Question)
 
 On re-reading the paper's §V-A1, we noticed that the framing of its ablation is actually about **trainability** -- the paper reports that "after removing the entire biomechanical model, the robot is completely unable to learn a coherent gait and only shuffles its feet asymmetrically on the ground." Out of curiosity, we ran the case of "disabling activation, Hill, and fatigue simultaneously" (keeping growth), with five seeds.
 
@@ -242,13 +242,13 @@ The result was that it still trained successfully, and the reward was even highe
 
 Isaac Gym Preview 4 has been discontinued. NVIDIA's official successor is **Isaac Lab**, built on top of Isaac Sim (and reusing the same rsl_rl PPO backend). The second stage migrates the entire SATA pipeline to Isaac Lab and answers a question that is more fundamental than the first stage: **can a faithful port still hold when only the simulation engine is swapped?**
 
-### 4.1 Design Principle of the Migration
+### 5.1 Design Principle of the Migration
 
 The key is to **fix the robot as the control variable**: reuse the same Go2, the same rsl_rl PPO backend, and use the Isaac Gym reproduction numbers as ground truth. If a new robot were used, one could not distinguish "a porting error" from "a genuine engine difference." This stage therefore ports as directly as possible and judges fidelity by the gap between the residual and the baseline, rather than presupposing that any inconsistency is due to a "cross-engine effect."
 
 One key sub-migration is the control paradigm: Isaac Lab's built-in Go2 task defaults to position (PD) control, whereas SATA is a torque/force policy. Configuring it for torque control and then porting the bio-inspired layer (activation low-pass, Hill, fatigue, Gompertz growth) onto it was the bulk of the work in this stage.
 
-### 4.2 Fidelity Debugging: Six Fixes
+### 5.2 Fidelity Debugging: Six Fixes
 
 After a direct port, the policy at one point crawled along the ground with its belly down. After six fidelity fixes, the policy turned into a clean walk. One key fix was this: SATA's joint **position** limits were originally used only for the reward and termination decisions and were not written into the physics simulation; the wider built-in USD thigh limits allowed exploration to overextend, which then triggered hard-limit termination in most episodes. We deliberately preserved every intermediate failure state as a record of the debugging journey.
 
@@ -256,7 +256,7 @@ After a direct port, the policy at one point crawled along the ground with its b
 
 > [Figure 7 here] A comparison of the debugging journey: left is the belly-crawl caused by an early reward-configuration bug; right is the clean walk after the fix (from `01_flat_rewardBug_crawl.gif` and `06_roughReplay_cleanWalk_still.png`).
 
-### 4.3 Eight-Seed Reproduction Results
+### 5.3 Eight-Seed Reproduction Results
 
 We retrained eight seeds of the full bio-inspired stack on SATA's rough terrain and compared item by item against the Isaac Gym baseline:
 
