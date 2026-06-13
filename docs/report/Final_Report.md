@@ -182,7 +182,7 @@ The first stage was carried out on Isaac Gym Preview 4, in four phases. All trai
 
 ### 4.1 Phase 1: Reproduction
 
-We trained the reference policy with SATA's released configuration. The initial three seeds yielded a mean reward of 114 ± 6; after extending to eight seeds, the value was 103.9 ± 15.9. The reproduction itself is an engineering exercise: along the way we resolved several environment and dependency issues (for example, Isaac Gym Preview 4 mandates Python 3.8, dependency versions must be pinned in a specific order, and there is the rental etiquette of a shared GPU). Only once reproduction holds does one earn the footing for subsequent analysis and critique.
+We trained the reference policy with SATA's released configuration. The initial three seeds yielded a mean reward of 114 ± 6; after extending to eight seeds, the value was 103.9 ± 15.9. (The same eight seeds recompute to 103.6 ± 16.0 under the matched per-term evaluation used for the cross-engine comparison in Chapter 5; the small difference is the metric, not the data.) The reproduction itself is an engineering exercise: along the way we resolved several environment and dependency issues (for example, Isaac Gym Preview 4 mandates Python 3.8; dependency versions must be pinned in a specific order, with numpy==1.21 and setuptools==59.5.0 re-pinned after the editable installs or they get overwritten; and there is the rental etiquette of a shared GPU, where the environment count must be tuned to avoid running out of memory). Only once reproduction holds does one earn the footing for subsequent analysis and critique.
 
 ### 4.2 Phase 2: Ablation Analysis (Eight Seeds)
 
@@ -210,7 +210,11 @@ We evaluated all forty-eight policies (six conditions × eight seeds) under eigh
 - After disabling activation, the peak torque surged to **42.5 N·m**, approaching the Go2's 45 N·m limit (about 1.8× the simulation clipping value of 23.5).
 - After disabling fatigue, walking on flat ground with no disturbance already consumed **2.5× the mechanical energy and 35× the action jerk.**
 
-In other words, the two constraints of fatigue and activation sacrificed training reward in exchange for policies the "hardware can actually execute." An important reinterpretation: disabling activation did not actually make the actions less smooth (its jerk was in fact lower, indicating PPO smooths things on its own); its real role is to **lock down peak torque.** In the payload tests, the reference policy reproduced the limitation SATA's paper acknowledges in §VI-A (the body height gradually sinks as the payload increases).
+In other words, the two constraints of fatigue and activation sacrificed training reward in exchange for policies the "hardware can actually execute." An important reinterpretation: disabling activation did not actually make the actions less smooth (its jerk was in fact lower, indicating PPO smooths things on its own); its real role is to **lock down peak torque.**
+
+**Under payload**, the reference policy reproduced the limitation SATA's paper acknowledges in §VI-A: as the payload increases its body height sinks (0.32 → 0.26 at 5 kg → 0.20 at 8 kg), and at the rated 8 kg its episode length drops to 2994 ± 471 steps (the large variance means some rollouts fall early). The no-fatigue policy, by contrast, beat the reference at **every** payload — reward Δ of +40 (5 kg), +94 (8 kg), +113 (10 kg), and +126 (15 kg), all p < 0.001 — and never fell (its episode length held near the nominal ~3578 throughout). But this advantage is the **same** sustained-high-torque behavior that shows up as 2.5× energy in nominal walking: the reference's §VI-A "failure" is the fatigue mechanism **refusing to thermally overload the actuators** to hold a beyond-rated load. In a simulator with no thermal model, refusing looks like weakness; on real hardware it is the protection the mechanism exists for. So the payload result is the core finding seen from the load axis, not a contradiction of it.
+
+**Under lateral push**, the picture is different: at the training magnitude (1.5 m/s) every condition holds near nominal, and at 3–5 m/s they all collapse together. Push does **not** discriminate the bio-inspired mechanisms — the discriminating axis is sustained load, not impulse.
 
 > [Figure 3 here] The hardware-feasibility chart under the no-disturbance scenario (from `nominal_feasibility.png`): peak torque / energy / action jerk for each condition, against the real-hardware reference lines.
 
@@ -234,7 +238,7 @@ Results (two-tailed Welch's test of residual vs. reference, eight seeds): under 
 
 On re-reading the paper's §V-A1, we noticed that the framing of its ablation is actually about **trainability** -- the paper reports that "after removing the entire biomechanical model, the robot is completely unable to learn a coherent gait and only shuffles its feet asymmetrically on the ground." Out of curiosity, we ran the case of "disabling activation, Hill, and fatigue simultaneously" (keeping growth), with five seeds.
 
-The result was that it still trained successfully, and the reward was even higher (138.6 ± 4.7). However, we **deliberately draw no conclusion** from this, for two reasons. First, with all three disabled, our torque pipeline degenerates into purely scaled raw torque, which is not necessarily equivalent to the baseline the paper used (the paper did not release the code for that ablation). Second, **reward does not equal gait quality** -- the paper's "cannot learn" refers to gait quality (shuffling in place), whereas we did not establish a gait-quality metric. This high reward therefore cannot refute the paper. We leave it as an honest open question.
+The result was that it still trained successfully, and the reward was even higher (138.6 ± 4.7). However, we **deliberately draw no conclusion** from this, for two reasons. First, with all three disabled, our torque pipeline degenerates into purely scaled raw torque (the tanh·τ_limit activation envelope and the Hill term cancel out), which is not necessarily equivalent to the baseline the paper used (the paper did not release the code for that ablation, and its public repo ships only the full model). Second, **reward does not equal gait quality** -- the paper's "cannot learn" refers to gait quality (shuffling in place), whereas we did not establish a gait-quality metric; a degenerate shuffle can still score reward. The paper also resets the robot "lying flat on the ground," whereas the public config resets to an upright low crouch, and the starting basin matters for a trainability question. This high reward therefore cannot refute the paper. We leave it as an honest open question.
 
 ---
 
@@ -265,9 +269,22 @@ We retrained eight seeds of the full bio-inspired stack on SATA's rough terrain 
 | Isaac Lab (this study) | 76.8 ± 16.2 | 82.3 ± 5.0 |
 | Isaac Gym (SATA baseline) | 103.6 ± 16.0 | 108.6 ± 8.0 |
 
-Both engines exhibit the **same structure**: seven seeds cluster together while one collapses late in PPO. We report the eight-seed numbers including the collapse as the headline result, rather than the prettier seven-seed numbers.
+Both engines exhibit the **same structure**: seven seeds cluster together while one collapses late in PPO (ours s5 → 38.4, the Gym reference s7 → 68.4). We report the eight-seed numbers including the collapse as the headline result, rather than the prettier seven-seed numbers.
 
-Decomposing the per-step reward term by term further reveals that **the gap between the positive task-reward terms (forward progress, head height, lateral movement, turning) and the Isaac Gym baseline is within about 0.002 per step** -- that is, the policy reproduced SATA's per-step task performance. The remaining reward gap concentrates in a single penalty term (the joint-acceleration penalty), whose definition differs across engines (SATA uses finite differences; we use the instantaneous acceleration from PhysX5, which captures contact-impact spikes that finite differences smooth out). We do not claim the two engines are equivalent; whether the gap is fully explained by this definitional difference remains an open question.
+Removing the episode-length confound (per-step = mean return / mean episode length), the 0.76 reward ratio factors into about 10% shorter episodes × about 16% lower per-step reward. Splitting the per-step number term by term (clean seeds) is the most informative view:
+
+| Term | Gym/step | Lab/step | Lab − Gym |
+|---|---:|---:|---:|
+| forward | 0.0400 | 0.0388 | −0.0012 |
+| head_height | 0.0130 | 0.0131 | +0.0001 |
+| moving_y | 0.0161 | 0.0138 | −0.0023 |
+| moving_yaw | 0.0127 | 0.0131 | +0.0004 |
+| roll | −0.0017 | −0.0014 | +0.0003 |
+| lin_vel_z | −0.0007 | −0.0007 | 0.0000 |
+| fatigue | −0.0130 | −0.0110 | +0.0020 |
+| joint_acc | −0.0111 | −0.0194 | −0.0083 |
+
+**The positive task-reward terms (forward progress, head height, lateral movement, turning) match the Isaac Gym baseline to within about 0.002 per step** -- that is, the policy reproduced SATA's per-step task performance -- and the per-step deficit is concentrated almost entirely (about 93%) in a single penalty term, the joint-acceleration penalty. That term's definition differs across engines: SATA uses finite differences, while we use the instantaneous acceleration from PhysX5, which captures contact-impact spikes that finite differences smooth out (we tried matching the finite-difference form; it trained markedly worse and was reverted). This **suggests** the residual is dominated by how the term is measured rather than by worse locomotion -- but we have not separated "measured differently" from "genuinely jerkier," and the ~10% episode-length shortfall is left as a real, unexplained residual. We do not claim the two engines are equivalent.
 
 ---
 
