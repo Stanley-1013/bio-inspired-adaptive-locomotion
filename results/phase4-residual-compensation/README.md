@@ -48,9 +48,15 @@ Reward (mean ± std) and the ref_residual-vs-reference Welch test:
 | payload | reference | no_fatigue | **ref_residual** | Δ(resid−ref) | p |
 |---|---:|---:|---:|---:|---:|
 | nominal | 280.2 | 236.5 | 280.4 | +0.2 | 0.95 (n.s.) |
-| 5 kg | 214.4 | 254.7 | 221.6 | +7.1 | 0.37 (n.s.) |
-| 8 kg | 60.5 | 154.6 | **82.7** | +22.3 | **0.045 ✱** |
-| 10 kg | 12.1 | 125.2 | 20.3 | +8.3 | **0.048 ✱** |
+| 5 kg | 214.4 | 254.7 | 221.6 | +7.1 | 0.39 (n.s.) |
+| 8 kg | 60.5 | 154.6 | **82.7** | +22.3 | 0.068 (n.s.) |
+| 10 kg | 12.1 | 125.2 | 20.3 | +8.3 | 0.071 (n.s.) |
+
+p is the two-sided Welch test (unequal variance) of ref_residual vs reference,
+n=8 seeds each. The 8 kg and 10 kg gains are positive but **not significant at
+α=0.05** (p≈0.07); a one-sided test would put them at p≈0.034/0.035, but we
+report the two-sided value as the honest default. Treat the payload recovery as
+a **suggestive trend, not an established effect**.
 
 Peak joint torque (N·m; real Go2 limit 45):
 
@@ -68,9 +74,10 @@ Peak joint torque (N·m; real Go2 limit 45):
   identical to the reference (Δ+0.2, p=0.95): with the body at target height the
   error term is ~0, so almost no residual torque is added. A compensator that
   does no harm in the normal regime is the minimum bar, and it clears it.
-- **It gives a small, borderline-significant improvement at the rated payload**
-  (8 kg: +22 reward, +37 %, p=0.045; 10 kg: +8, p=0.048). Both p-values are just
-  under 0.05 with high variance — "suggestive", not strong.
+- **It gives a small positive trend at the rated payload**
+  (8 kg: +22 reward, +37 %; 10 kg: +8). But with n=8 and high seed variance the
+  two-sided Welch test is **not significant** (p≈0.068 / 0.071) — suggestive at
+  best, not an established effect.
 - **It stays firmly within the actuator envelope** (+~2 N·m over reference;
   ≤28 N·m vs the 45 N·m limit), unlike the no_activation ablation (42.5 N·m at
   nominal). It also keeps *every* bio constraint, unlike no_fatigue which
@@ -94,8 +101,9 @@ does not deliver it. See the control-theoretic reading in
 
 ## Caveats
 
-- Improvements are borderline-significant (p≈0.045–0.05) with high seed
-  variance; treat as preliminary boundary-case evidence, not a strong claim.
+- Improvements are a positive trend but **not significant** (two-sided Welch
+  p≈0.068–0.071) with high seed variance; treat as preliminary boundary-case
+  evidence, not an established effect.
 - Gains were hand-tuned on seed 1 at 8 kg, then fixed across all seeds/payloads
   — not separately optimised per payload (a fixed controller, by design).
 - Simulation only; "within envelope" = within the rated torque number, not

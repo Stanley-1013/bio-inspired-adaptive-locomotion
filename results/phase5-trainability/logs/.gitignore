@@ -1,0 +1,2 @@
+# Per-seed training stdout is bulky and regenerable; keep only the launcher summary.
+no_biomech_s*.log

@@ -60,6 +60,9 @@ CONDITION_INFO = {
     "no_activation": ("no_activation","go2_torque_no_activation"),
     "no_growth":     ("no_growth",    "go2_torque_no_growth"),
     "hard_terrain":  ("hard_terrain", "go2_torque_hard_terrain"),
+    # Phase 5: all three biomechanical stages off, growth kept — reproduces the
+    # paper's "SATA w/o biomechanical model" (§V-A1).
+    "no_biomech":    ("no_biomech",   "go2_torque_no_biomech"),
     # Phase 4: a frozen reference (ref_sN) policy run inside the residual env
     # (tau_total = tau_SATA + classical height-PD on the calf joints).
     "ref_residual":  ("ref",          "go2_torque_residual"),

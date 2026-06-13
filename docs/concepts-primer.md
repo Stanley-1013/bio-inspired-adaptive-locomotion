@@ -60,7 +60,7 @@ SATA's Go2 task uses a 60-dimensional observation, including:
 - 重力方向投影 / projected gravity direction
 - 速度命令 / commanded velocity
 - 關節角與關節速度 / joint positions and velocities
-- 上一步 action / previous action
+- 施加的關節力矩 (τ) / applied joint torques (τ)
 - 每個關節的 fatigue state / per-joint fatigue state
 
 ### Action
@@ -220,10 +220,10 @@ SATA 用 Hill model 的簡化形式把這件事放進機器人控制：
 SATA uses a simplified Hill model to add this effect to robot control:
 
 ```text
-torque = sign * tau_max * (1 - sign * joint_velocity / omega_max)
+torque = a * tau_max * (1 - sign(a) * joint_velocity / omega_max)
 ```
 
-如果 action 想讓關節往某方向出力，而關節已經往同方向快速轉動，最大可用 torque 會下降。這讓控制器更像受肌肉限制的生物系統。
+`a` 是連續 activation（±1），`sign(a)` 只取它的方向（±1）。如果 action 想讓關節往某方向出力，而關節已經往同方向快速轉動，最大可用 torque 會下降。這讓控制器更像受肌肉限制的生物系統。
 
 If the action requests torque in a direction where the joint is already moving quickly, available torque decreases. This makes the controller more like a biological system with muscle limitations.
 
@@ -234,12 +234,12 @@ If the action requests torque in a direction where the joint is already moving q
 Real muscle does not produce maximum force instantly after receiving a command. SATA models this delay with a first-order low-pass filter.
 
 ```text
-new_activation = 0.6 * old_activation + 0.4 * requested_activation
+new_activation = 0.6 * requested_activation + 0.4 * old_activation
 ```
 
-這代表新的 activation 有 60% 來自上一刻，40% 來自現在的命令。結果是力矩變化更平滑，也更接近生物肌肉。
+這代表新的 activation 有 60% 來自現在的命令，40% 來自上一刻（程式碼 `(curr - prev) * 0.6 + prev`）。結果是力矩變化更平滑，也更接近生物肌肉。
 
-This means the new activation is 60% from the previous activation and 40% from the current command. The result is smoother torque changes and more muscle-like behavior.
+This means the new activation is 60% from the current command and 40% from the previous activation (the code computes `(curr - prev) * 0.6 + prev`). The result is smoother torque changes and more muscle-like behavior.
 
 ## Fatigue 的直覺 / Intuition Behind Fatigue
 

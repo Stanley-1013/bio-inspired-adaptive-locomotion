@@ -26,8 +26,10 @@ registered as a new task in SATA's `envs/__init__.py` (additions in
 | `go2_torque_no_fatigue` | `motor_fatigue=False`, reward scale 0 | Does fatigue feedback drive adaptive load-shedding? |
 | `go2_torque_no_hill` | `hill_model=False` | Does the force-velocity drop-off matter for the resulting gait? |
 | `go2_torque_no_activation` | `activation_process=False` | Does the activation low-pass tame action smoothness, or is the policy naturally smooth? |
-| `go2_torque_no_growth` | `control_type='T'` (forces general_scale=1 from start) | Is the growth curriculum necessary for convergence, or just convenience? |
+| `go2_torque_no_growth` | `control_type='T'` (pins general_scale≈0.79 from the start, not full development — see note) | Is the growth curriculum necessary for convergence, or just convenience? |
 | `go2_torque_hard_terrain` | `terrain_proportions=[0,0.4,0.3,0.3,0]` (60 % stairs) | Does the reference config still converge on out-of-distribution-style terrain? |
+
+> **Note on `no_growth`.** `control_type='T'` forces `step_count = num_steps_per_env × checkpoint = 24 × 3000 = 72000` from the first step ([go2_torque.py:179-183](https://github.com/marmotlab/SATA/blob/8fc422af3fec463a408779b1685c2453d0040be8/legged_gym/legged_gym/envs/go2/go2_torque/go2_torque.py#L179)). The Gompertz curve at step 72000 (k=3e-5, x0=24000) gives **general_scale ≈ 0.79**, not 1.0 — i.e. the robot starts highly but not fully developed (front-torque ceiling ≈ 0.85·τ, control freq ≈ 179 Hz). So this ablation removes the *curriculum* (no gradual ramp) while leaving capability near-max from the start; it is not a "full capability from step 0" condition.
 
 ## Launch strategy (adaptive)
 
@@ -62,14 +64,16 @@ bash ~/workspace/bio-inspired-adaptive-locomotion/results/phase2-ablation/check_
 ## Results (8 seeds per condition)
 
 > **Read this first — what these numbers are and are not.** The metric below is
-> *training-distribution scalar reward*. The SATA bio-inspired mechanisms are
-> designed primarily as **feasibility / safety constraints for sim-to-real
-> transfer** (bounded actuator torque, smooth activation, fatigue-based thermal
-> protection), not as devices to raise training reward. A constraint that
-> serves sim-to-real will, by construction, often *cost* a little training
-> reward in a clean simulator — so "ablating it raises reward" is the
-> *expected* sign of a working constraint, not evidence the mechanism is
-> useless. The decisive evaluation of these mechanisms is the out-of-distribution
+> *training-distribution scalar reward*. The paper motivates the SATA
+> bio-inspired mechanisms around **both** early-stage exploration / trainability
+> *and* motion smoothness / sim-to-real feasibility (§III-A) — bounded actuator
+> torque, smooth activation, fatigue-based thermal protection. On the
+> training-reward axis measured here, only the *feasibility* face is visible:
+> a constraint that serves sim-to-real will, by construction, often *cost* a
+> little training reward in a clean simulator — which is why "ablating it raises
+> reward" is the *expected* sign of a working constraint, not evidence the
+> mechanism is useless. (The exploration / trainability face the paper leads
+> with does not show up on this scalar-reward axis.) The more informative evaluation of these mechanisms is the out-of-distribution
 > / feasibility analysis in [`../phase3-bio-claims-and-robustness/`](../phase3-bio-claims-and-robustness/),
 > not this table. Treat the numbers here as *characterising the cost of each
 > constraint in-distribution*, and read them alongside that caveat.

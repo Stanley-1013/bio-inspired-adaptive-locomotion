@@ -40,7 +40,7 @@ The policy's 12-dimensional action `a` is not directly the joint torque. Four pr
 
    ```text
    sign_curr = tanh(a_scaled / tau_max)
-   sign      = 0.6 * sign_prev + 0.4 * sign_curr
+   sign      = 0.6 * sign_curr + 0.4 * sign_prev
    ```
 
    這是一階低通濾波（first-order low-pass）。直覺上，它模擬肌肉招募或馬達出力建立的延遲，避免力矩在正負最大值之間瞬間跳變。
@@ -50,10 +50,10 @@ The policy's 12-dimensional action `a` is not directly the joint torque. Four pr
 3. **Hill 模型 / Hill Model** (`hill_model=True`)
 
    ```text
-   tau = sign * tau_max * (1 - sign * omega / omega_max)
+   tau = a * tau_max * (1 - sign(a) * omega / omega_max)
    ```
 
-   Hill model 表達「同方向速度越快，能產生的最大力越小」的力-速度關係（force-velocity inverse relation）。如果關節正在同方向快速運動，可用力矩會下降；減速方向則不受這個限制。
+   其中 `a` 是連續的 activation（±1 之間），`sign(a)` 是它的方向（離散 ±1）；`tau_max`／`omega_max` 是逐關節、受 growth 縮放的力矩與速度上限。Hill model 表達「同方向速度越快，能產生的最大力越小」的力-速度關係（force-velocity inverse relation）。如果關節正在同方向快速運動，可用力矩會下降；減速方向則不受這個限制。
 
    The Hill model captures an inverse force-velocity relation: maximum producible torque drops when the joint moves fast in the same direction, while deceleration is unaffected.
 
@@ -81,9 +81,9 @@ Each biomechanical stage can be ablated independently by flipping its boolean in
 general_scale = exp(-exp(-k * (step - x0)))    # k=3e-5, x0=24,000
 ```
 
-這個 step 指的是累積 environment step count，不是 PPO iteration count。它大約在 12k 到 60k steps 之間從接近 0 上升到接近 1。
+這個 step 指的是累積 environment step count，不是 PPO iteration count。曲線在 x0=24k steps 處通過反曲點（G≈0.37）：12k→0.24、24k→0.37、60k→0.71，約 124k 才到 0.95。換句話說早期被明顯壓低、後期緩慢趨近 1。
 
-The curve is driven by cumulative environment steps rather than PPO iterations. It rises from near 0 to near 1 over roughly 12k to 60k steps.
+The curve is driven by cumulative environment steps rather than PPO iterations. Its inflection is at x0=24k (G≈0.37): 12k→0.24, 24k→0.37, 60k→0.71, reaching 0.95 only near 124k. Early capability is markedly suppressed; it approaches 1 slowly.
 
 同一個 scalar 同時控制多個訓練條件：
 
@@ -167,10 +167,10 @@ The observation is assembled in [go2_torque.py:285-295](https://github.com/marmo
 | 0:3 | Base linear velocity，body frame |
 | 3:6 | Base angular velocity |
 | 6:9 | Gravity vector projected to body frame |
-| 9:12 | Velocity command `(v_x, v_y, ω_yaw)` |
-| 12:24 | Joint positions - default angles，12 DOF |
-| 24:36 | Joint velocities，12 DOF |
-| 36:48 | Previous action |
+| 9:21 | Joint positions - default angles，12 DOF |
+| 21:33 | Joint velocities，12 DOF |
+| 33:36 | Velocity command `(v_x, v_y, ω_yaw)` |
+| 36:48 | Applied joint torques `self.torques`，12 DOF（not previous action） |
 | **48:60** | **Per-DOF fatigue state，SATA-specific addition** |
 
 ---

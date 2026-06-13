@@ -15,8 +15,9 @@ whole thing through adaptive/robust control's questions. Headline: on *training
 reward* alone, removing the fatigue or activation constraint slightly *raises*
 reward, but Phase 3 shows those ablations only "win" by leaving the
 hardware-realisable torque envelope (`no_activation` peaks at 42.5 N·m vs the
-real Go2's 45 N·m limit). The bio mechanisms are **sim-to-real feasibility
-constraints, not reward devices**. Start here:
+real Go2's 45 N·m limit). On the actuator-feasibility axis we measured, the bio
+mechanisms behave more like **sim-to-real feasibility constraints than reward
+devices**. Start here:
 [`docs/sata-overview.md`](./docs/sata-overview.md) (what SATA contributes) ·
 [`docs/control-perspective.md`](./docs/control-perspective.md) (the synthesis) ·
 [results phases 1–4](./results/) · [`docs/setup-sata.md`](./docs/setup-sata.md).
@@ -47,7 +48,7 @@ Disturbances are real sim changes (forces / friction / leg recolour); arrows and
 labels are post-hoc overlays. Full gallery + the payload comparison:
 [`results/phase3-bio-claims-and-robustness/videos/`](./results/phase3-bio-claims-and-robustness/videos/).
 
-### The core finding in one comparison (10 kg payload, beyond rated capacity)
+### What we observed, in one comparison (10 kg payload, beyond rated capacity)
 
 | reference (full SATA) — reproduces the paper's §VI-A payload limit | `no_fatigue` ablation — stays up, but by hardware-infeasible thrashing |
 |---|---|
@@ -105,13 +106,14 @@ compensation** term in boundary cases.
   [`results/phase3-bio-claims-and-robustness/`](./results/phase3-bio-claims-and-robustness/)
 - **Phase 4 (Residual compensation) — done (2026-05-29).** A simple stance-gated
   classical height-PD residual `τ_total = τ_SATA + τ_comp`, bolted onto the
-  frozen reference policy, gives a small, borderline-significant payload-reward
-  recovery (8 kg: +37 %, p=0.045) **within the actuator envelope and harmless at
-  nominal** — but only ~1/4 of the way to the no_fatigue ablation, because the
+  frozen reference policy, gives a small payload-reward recovery (8 kg: +37 %, a
+  positive but not-significant trend, two-sided Welch p≈0.07) **within the
+  actuator envelope and harmless at nominal** — but only ~1/4 of the way to the
+  no_fatigue ablation, because the
   frozen policy treats the residual as a disturbance. Motivates co-trained
   RL+adaptation (RL2AC). [`results/phase4-residual-compensation/`](./results/phase4-residual-compensation/)
-- **Synthesis — the control-theoretic reading** (delivers this project's
-  original framing): [`docs/control-perspective.md`](./docs/control-perspective.md)
+- **Synthesis — the control-theoretic reading** (the framing this project set
+  out to apply): [`docs/control-perspective.md`](./docs/control-perspective.md)
   maps every finding onto the questions adaptive/robust control asks, and
   corrects two tempting-but-wrong analogies using the data.
 
@@ -163,7 +165,7 @@ fatigue, growth) to achieve safe and adaptive locomotion.
 - *(Optional, if time allows)* Explore a lightweight **residual compensation**
   term to handle boundary cases.
 
-**Key contribution:** **contrast two philosophies of adaptation** —
+**What we aimed for:** **contrast two philosophies of adaptation** —
 learning-based locomotion vs. classical adaptive/robust control — through
 understanding and experiments.
 
