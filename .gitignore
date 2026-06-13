@@ -46,3 +46,11 @@ docs/report/Final_Report_Adaptive_Control.docx
 
 # IEEE 版(適應控制課,帶課程標示;留本機上 Overleaf 編譯)
 docs/report/Final_Report_Adaptive_Control_IEEE.tex
+docs/report/Final_Report_Adaptive_Control_IEEE.pdf
+docs/report/IEEE_overleaf.zip
+docs/report/*.aux
+docs/report/*.log
+docs/report/*.out
+docs/report/*.fdb_latexmk
+docs/report/*.fls
+docs/report/*.synctex.gz
